@@ -1,5 +1,5 @@
 from flask import Flask
-from flask_security import Security, SQLAlchemyUserDatastore, auth_required
+from flask_security import Security, SQLAlchemyUserDatastore
 from backend.config import local
 from backend.model import db, User, Role
 
@@ -22,14 +22,9 @@ def create_app():
 app = create_app()
 import backend.innit
 
-@app.get("/")
-def home():
-    return "<h1>Hello, World!</h1>"
+from backend.routes import *
 
-@app.get("/protected")
-@auth_required()
-def protected():
-    return "<h1>Admin Page</h1>"
+print("Running app.py")
 
 
 if __name__ == "__main__":

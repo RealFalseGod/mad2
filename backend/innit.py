@@ -9,7 +9,7 @@ with app.app_context():
 
     # Create roles if they don’t already exist
     userdatastore.find_or_create_role(name="admin", description="Administrator")
-    userdatastore.find_or_create_role(name="customer", description="Customer")
+    userdatastore.find_or_create_role(name="user", description="Customer")
     userdatastore.find_or_create_role(name="staff", description="Provides services")
 
     # Create default admin user if they don’t exist
