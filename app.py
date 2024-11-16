@@ -3,6 +3,7 @@ from flask_security import Security, SQLAlchemyUserDatastore
 from backend.config import local
 from backend.model import db, User, Role
 
+
 def create_app():
     app = Flask(__name__)
     app.config.from_object(local)
@@ -15,9 +16,10 @@ def create_app():
 
     # Flask-Security initialization
     datastore = SQLAlchemyUserDatastore(db, User, Role)
-    app.security = Security(app, datastore=datastore , register_blueprint=False)
+    app.security = Security(app, datastore=datastore, register_blueprint=False)
     app.app_context().push()
     return app
+
 
 app = create_app()
 import backend.innit
