@@ -1,7 +1,8 @@
-from app import app
+from flask import current_app as app
 from flask_security import auth_required
 
 @app.get("/")
+@app.get("/home")
 def home():
     return "<h1>Hello, World!</h1>"
 

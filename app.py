@@ -15,7 +15,7 @@ def create_app():
 
     # Flask-Security initialization
     datastore = SQLAlchemyUserDatastore(db, User, Role)
-    app.security = Security(app, datastore=datastore)
+    app.security = Security(app, datastore=datastore , register_blueprint=False)
     app.app_context().push()
     return app
 
