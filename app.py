@@ -5,7 +5,7 @@ from backend.model import db, User, Role
 
 
 def create_app():
-    app = Flask(__name__)
+    app = Flask(__name__,static_folder='frontend/build')
     app.config.from_object(local)
 
     # Model initialization
@@ -22,6 +22,7 @@ def create_app():
 
 
 app = create_app()
+
 import backend.innit
 
 from backend.routes import *
