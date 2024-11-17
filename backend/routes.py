@@ -1,5 +1,5 @@
 from flask import current_app as app, request, jsonify
-from flask_security import auth_required, verify_password, hash_password, login_user
+from flask_security import auth_required, verify_password, hash_password
 from backend.model import db
 
 
@@ -13,33 +13,10 @@ def home():
 
 
 @app.get("/protected")
-@auth_required()
+@auth_required('token')
 def protected():
     print(request.headers)
     return "<h1>Admin Page</h1>"
-
-
-# @app.route("/login", methods=["POST"])
-# def login():
-#     username = request.json.get("username")
-#     password = request.json.get("password")
-#     user = datastore.find_user(username=username)
-
-#     if user and verify_password(password, user.password):
-#         login_user(user)  # Logs in the user and creates a session
-#         # Flask-Security automatically manages the token for the session if configured properly
-#         return (
-#             jsonify(
-#                 {
-#                     "token": user.get_auth_token(),
-#                     "email": user.email,
-#                     "role": user.roles[0].name,
-#                     "id": user.id,
-#                 }
-#             ),
-#             200,
-#         )
-#     return jsonify({"msg": "Bad username or password"}), 401
 
 
 @app.route("/login", methods=["POST"])
