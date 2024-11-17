@@ -26,7 +26,7 @@ import backend.innit
 
 from backend.routes import *
 
-print("Running app.py")
+# print("Running app.py")
 
 
 if __name__ == "__main__":
