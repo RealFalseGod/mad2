@@ -16,15 +16,15 @@ export default {
     },
     methods: {
         async submitLogin() {
-            const res = await fetch(location.origin + "/login", 
+            const res = await fetch(location.origin + "/login",
                 {
                     headers: { "Content-Type": "application/json" },
-                    body: { text: this.text, email: this.email, password: this.password },
+                    body: JSON.stringify({ email: this.email, password: this.password }),
                     method: "POST",
                 });
             if (res.ok) {
                 console.log("we are logged in sir");
-                data = await res.json();
+                const data = await res.json();
                 console.log(data);
             }
         },
