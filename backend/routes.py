@@ -1,4 +1,4 @@
-from flask import current_app as app, request, jsonify
+from flask import current_app as app, request, jsonify, render_template
 from flask_security import auth_required, verify_password, hash_password
 from backend.model import db
 
@@ -9,15 +9,7 @@ datastore = app.security.datastore
 @app.get("/")
 @app.get("/home")
 def home():
-    return "<h1>Hello, World!</h1>"
-
-
-@app.get("/protected")
-@auth_required('token')
-def protected():
-    print(request.headers)
-    return "<h1>Admin Page</h1>"
-
+    return render_template("index.html")
 
 @app.route("/login", methods=["POST"])
 def login():
@@ -50,6 +42,11 @@ def login():
 
     return jsonify({"error": "Invalid email or password"}), 400
 
+@app.get("/protected")
+@auth_required("token")
+def protected():
+    print(request.headers)
+    return "<h1>Admin Page</h1>"
 
 @app.route("/register", methods=["POST"])
 def register():

@@ -5,7 +5,12 @@ from backend.model import db, User, Role
 
 
 def create_app():
-    app = Flask(__name__,static_folder='frontend/build')
+    app = Flask(
+        __name__,
+        static_folder="frontend",
+        template_folder="frontend",
+        static_url_path="/static",
+    )
     app.config.from_object(local)
 
     # Model initialization
