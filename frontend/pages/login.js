@@ -1,7 +1,7 @@
 export default {
     template: `
     <div>
-        <input placeholder='Username' v-model='text' />
+        <input placeholder='Username' v-model='username' />
         <input placeholder='email' v-model='email' />
         <input placeholder='password' v-model='password' />
         <button @click="submitLogin"> Login </button>
@@ -9,7 +9,7 @@ export default {
       `,
     data() {
         return {
-            text: null,
+            username: null,
             email: null,
             password: null,
         };
@@ -19,7 +19,7 @@ export default {
             const res = await fetch(location.origin + "/login",
                 {
                     headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ email: this.email, password: this.password }),
+                    body: JSON.stringify({username: this.username, email: this.email, password: this.password }),
                     method: "POST",
                 });
             if (res.ok) {
