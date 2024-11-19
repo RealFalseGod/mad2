@@ -12,7 +12,7 @@ export default {
       `,
     data() {
         return {
-            text: null,
+            username: null,
             email: null,
             password: null,
             address: null,
@@ -22,16 +22,24 @@ export default {
     },
     methods: {
         async submitLogin() {
-            const res = await fetch(location.origin + "/login",
+            const res = await fetch(location.origin + "/register",
                 {
                     headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ email: this.email, password: this.password }),
+                    body: JSON.stringify({
+                        email: this.email,
+                        username: this.username,
+                        password: this.password,
+                        address: this.address,
+                        pincode: this.pincode,
+                        role: this.role,
+                    }),
                     method: "POST",
                 });
             if (res.ok) {
-                console.log("we are logged in sir");
-                const data = await res.json();
-                console.log(data);
+                console.log("we are registered in sir");
+                const errorData = await res.json();
+                console.error("Registration failed:", errorData);
+                
             }
         },
     },

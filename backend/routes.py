@@ -32,6 +32,7 @@ def login():
             jsonify(
                 {
                     "token": user.get_auth_token(),
+                    "username": user.username,
                     "email": user.email,
                     "role": user.roles[0].name,
                     "id": user.id,
@@ -51,13 +52,14 @@ def protected():
 @app.route("/register", methods=["POST"])
 def register():
     data = request.get_json()
+    print(data)
 
     username = data.get("username")
     email = data.get("email")
     password = data.get("password")
     address = data.get("address")
     pincode = data.get("pincode")
-    role = data.get("register as in customer or staff")
+    role = data.get("role")
 
     if not email or not password or role not in ["user", "staff"]:
         return jsonify({"error": "Invalid inputs"}), 400
