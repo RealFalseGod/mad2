@@ -11,6 +11,7 @@ class local(config):
     SECRET_KEY = "veryverysecretkey"
     SECURITY_TOKEN_AUTHENTICATION_HEADER = "auth-token"
 
+    
 
     WTF_CSRF_ENABLED = False
 

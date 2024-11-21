@@ -39,3 +39,14 @@ class UserRoles(db.Model):
 
     def __repr__(self):
         return f"<UserRoles(user_id={self.user_id}, role_id={self.role_id})>"
+
+class post(db.Model):
+    __tablename__ = "posts"
+    id = db.Column(db.Integer, primary_key=True)
+    service = db.Column(db.String(80), nullable=False)
+    content = db.Column(db.String(), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
+
+    def __repr__(self):
+        return f"<post(id={self.id}, service='{self.service}', content='{self.content}')>"
+

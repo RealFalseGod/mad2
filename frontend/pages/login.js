@@ -4,7 +4,7 @@ export default {
         <input placeholder='Username' v-model='username' />
         <input placeholder='email' v-model='email' />
         <input placeholder='password' v-model='password' />
-        <button @click="submitLogin"> Login </button>
+        <button class='btn btn-primary' @click="submitLogin"> Login </button>
     </div>
       `,
     data() {

@@ -2,6 +2,7 @@ from flask import Flask
 from flask_security import Security, SQLAlchemyUserDatastore
 from backend.config import local
 from backend.model import db, User, Role
+from backend.resources import api
 
 
 def create_app():
@@ -12,9 +13,12 @@ def create_app():
         static_url_path="/static",
     )
     app.config.from_object(local)
-
+    
     # Model initialization
     db.init_app(app)
+
+    # API initialization
+    api.init_app(app)
 
     with app.app_context():
         db.create_all()

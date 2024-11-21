@@ -19,9 +19,9 @@ def login():
     email = data.get("email")
     password = data.get("password")
 
-    if username:
-        if not email or not password:
-            return jsonify({"error": "Invalid email or password"}), 400
+    
+    if not email or not password:
+        return jsonify({"error": "Invalid email or password"}), 400
 
     user = datastore.find_user(email=email)
     if not user:
@@ -46,13 +46,11 @@ def login():
 @app.get("/protected")
 @auth_required("token")
 def protected():
-    print(request.headers)
     return "<h1>Admin Page</h1>"
 
 @app.route("/register", methods=["POST"])
 def register():
     data = request.get_json()
-    print(data)
 
     username = data.get("username")
     email = data.get("email")
