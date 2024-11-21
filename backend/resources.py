@@ -24,7 +24,7 @@ class post_api(Resource):
         if not post:
             return {"message": "Post not found"}, 404
         return post
-    
+
     @auth_required("token")
     def delete(self, post_id):
         post = post.query.get(post_id)
@@ -40,19 +40,21 @@ class post_api(Resource):
                 db.session.rollback()
                 return {"message": "Error deleting post"}, 500
         else:
-            return {"message": "You are not authorized to delete this post"}, 403 
+            return {"message": "You are not authorized to delete this post"}, 403
 
         return {"message": "Post deleted"}, 204
 
+
 class postlist_api(Resource):
-    @auth_required("token")
+
     @marshal_with(post_fields)
+    @auth_required("token")
     def get(self):
         posts = post.query.all()
-
         return posts
-    
-    def upload_post(self):
+
+    @auth_required("token")
+    def post(self):
         data = request.get_json()
 
         new_post = post(
@@ -63,11 +65,12 @@ class postlist_api(Resource):
         try:
             db.session.add(new_post)
             db.session.commit()
-        except:            
+        except:
             db.session.rollback()
             return {"message": "Error creating post"}, 500
 
         return {"message": "Post created"}, 201
 
-api.add_resource(post_api, '/post/<int:post_id>')
-api.add_resource(postlist_api, '/posts')
+
+api.add_resource(post_api, "/post/<int:post_id>")
+api.add_resource(postlist_api, "/posts")
