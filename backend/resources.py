@@ -14,7 +14,6 @@ post_fields = {
     "user_id": fields.Integer,
 }
 
-
 class post_api(Resource):
     @auth_required("token")
     @marshal_with(post_fields)
