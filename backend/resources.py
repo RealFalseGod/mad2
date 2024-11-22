@@ -54,7 +54,7 @@ class postlist_api(Resource):
         return posts
 
     @auth_required("token")
-    def post(self):
+    def post(self): # Create a new post
         data = request.get_json()
 
         new_post = post(
@@ -65,6 +65,7 @@ class postlist_api(Resource):
         try:
             db.session.add(new_post)
             db.session.commit()
+            return {"message": "Post created"}, 201
         except:
             db.session.rollback()
             return {"message": "Error creating post"}, 500
