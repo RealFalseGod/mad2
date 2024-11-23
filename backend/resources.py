@@ -18,11 +18,11 @@ class post_api(Resource):
     @auth_required("token")
     @marshal_with(post_fields)
     def get(self, post_id):
-        post = post.query.get(post_id)
+        post_instance = post.query.get(post_id)
 
-        if not post:
+        if not post_instance:
             return {"message": "Post not found"}, 404
-        return post
+        return post_instance
 
     @auth_required("token")
     def delete(self, post_id):

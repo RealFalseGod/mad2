@@ -4,8 +4,7 @@ export default {
 
     template: `
     <div>
-        <h1>post view page</h1>  
-        <h1> {{id}} </h1>
+        <h1>post view page</h1>          
         <h2>{{post.service}}</h2>      
         <p>{{post.user_id}}</p>
         <p>{{post.content}}</p>
