@@ -18,7 +18,7 @@ class post_api(Resource):
     @auth_required("token")
     @marshal_with(post_fields)
     def get(self, post_id):
-        post = post.query.get()
+        post = post.query.get(post_id)
 
         if not post:
             return {"message": "Post not found"}, 404

@@ -6,7 +6,8 @@ const app = new Vue({
     el: "#app",
     template: `
         <div>
-            <Navbar />
+            <h1><Navbar /></h1>
+            
             <router-view> </router-view>
         </div>
     `,

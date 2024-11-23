@@ -2,9 +2,9 @@ import Post from "../components/Post.js";
 
 export default {
     template: `
-    <div>
+    <div class='p-4'>
         <h1>blogs list</h1>
-        <Post v-for="post in posts" :service='post.service' :author_id='post.user_id' />
+        <Post v-for="post in posts" :service='post.service' :author_id='post.user_id' :post_id='post.id' />
     </div>
     `,
 
