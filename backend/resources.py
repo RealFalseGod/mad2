@@ -69,8 +69,7 @@ class postlist_api(Resource):
             db.session.rollback()
             return {"message": "Error creating post"}, 500
 
-        return {"message": "Post created"}, 201
 
 
-api.add_resource(post_api, "/post/<int:post_id>")
+api.add_resource(post_api, "/posts/<int:post_id>")
 api.add_resource(postlist_api, "/posts")
