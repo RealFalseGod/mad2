@@ -12,6 +12,7 @@ const store = new Vuex.Store({
             try {
                 if (JSON.parse(localStorage.getItem("user"))) {
                     const user = JSON.parse(localStorage.getItem("user"));
+                    
                     state.auth_token = user.token;
                     state.role = user.role;
                     state.loggedin = true;

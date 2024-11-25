@@ -16,7 +16,6 @@ def home():
 def login():
     data = request.get_json()
 
-    username = data.get("username")
     email = data.get("email")
     password = data.get("password")
 
