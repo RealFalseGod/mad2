@@ -2,7 +2,7 @@ export default {
     template: `
     <div>
         <input placeholder='email' v-model='email' />
-        <input placeholder='password' v-model='password' />
+        <input placeholder='password' type='password' v-model='password' />
         <button class='btn btn-primary' @click="submitLogin"> Login </button>
     </div>
       `,
