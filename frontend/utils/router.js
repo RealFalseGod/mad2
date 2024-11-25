@@ -14,8 +14,8 @@ const routes = [
     { path: "/", component: home },
     { path: "/login", component: login },
     { path: "/register", component: register },
-    { path: "/services", component: services_list },
-    { path: "/posts/:id", component: post_display, props: true },
+    { path: "/services", component: services_list, meta: { requiresAuth: true } },
+    { path: "/posts/:id", component: post_display, props: true, meta: { requiresAuth: true } },
 
 ];
 
@@ -23,20 +23,20 @@ const router = new VueRouter({ routes });
 
 // frontened navigation guards
 
-// router.router.beforeEach((to, from, next) => {
-//     // to and from are both route objects. must call `next`.
-//     if (to.matched.some((record) => record.meta.requiresAuth)) {
-//         if (!store.state.loggedin) {
-//             next({ path: "/login" })
-//         } else if (to.meta.role && to.meta.role !== store.role) {
-//             next({ path: "/" })
-//         } else {
-//             next();
-//         }
-//     } else {
-//         next();
-//     }
-// });
+router.beforeEach((to, from, next) => {
+    // to and from are both route objects. must call `next`.
+    if (to.matched.some((record) => record.meta.requiresAuth)) {
+        if (!store.state.loggedin) {
+            next({ path: "/login" })
+        } else if (to.meta.role && to.meta.role !== store.role) {
+            next({ path: "/" })
+        } else {
+            next();
+        }
+    } else {
+        next();
+    }
+});
 
 
 export default router;
