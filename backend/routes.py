@@ -1,16 +1,37 @@
 from flask import current_app as app, request, jsonify, render_template
 from flask_security import auth_required, verify_password, hash_password
 from backend.model import db
+from datetime import datetime
+from backend.celery.tasks import add
+from celery.result import AsyncResult
 
 
 datastore = app.security.datastore
-
+cache = app.cache
 
 @app.get("/")
 @app.get("/home")
 def home():
     return render_template("index.html")
 
+@app.get("/celery")
+def celery():
+    task = add.delay(10,20)
+    return {"task_id" : task.id}, 200
+
+@app.get('/getdata/<id>')
+def getdata(id):
+    result = AsyncResult(id)
+    
+    if result.ready():
+        return {"result": result.result}, 200
+    else:
+        return {"status": "Processing"}, 202
+
+@app.get("/cache")
+@cache.cached(timeout=5)
+def cache():
+    return{'time': str(datetime.now()) }
 
 @app.route("/login", methods=["POST"])
 def login():
