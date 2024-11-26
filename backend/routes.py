@@ -1,9 +1,10 @@
-from flask import current_app as app, request, jsonify, render_template
+from flask import current_app as app, request, jsonify, render_template, send_file
 from flask_security import auth_required, verify_password, hash_password
 from backend.model import db
 from datetime import datetime
 from backend.celery.tasks import add
 from celery.result import AsyncResult
+from backend.celery.tasks import create_csv
 
 
 datastore = app.security.datastore
@@ -13,6 +14,23 @@ cache = app.cache
 @app.get("/home")
 def home():
     return render_template("index.html")
+
+@app.get('/getcsv/<id>')
+def getCSV(id):
+    result = AsyncResult(id)
+
+    if result.ready():
+        filename = result.result
+        return send_file(f'./backend/celery/userdownload/{filename}') #, as_attachment=True
+    else:
+        return {"status": "Processing"}, 202
+    
+    
+@auth_required('token') 
+@app.get('/createcsv')
+def createCSV():
+    task = create_csv.delay()
+    return {'task_id' : task.id}, 200
 
 @app.get("/celery")
 def celery():

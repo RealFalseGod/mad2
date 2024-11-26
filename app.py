@@ -4,7 +4,7 @@ from backend.config import local
 from backend.model import db, User, Role
 from flask_caching import Cache
 from backend.celery.celery_config import celery_init_app
-
+import flask_excel as excel
 
 def create_app():
     app = Flask(
@@ -46,8 +46,8 @@ import backend.innit
 
 from backend.routes import *
 
+excel.init_excel(app)
+
 # print("Running app.py")
-
-
 if __name__ == "__main__":
     app.run()
