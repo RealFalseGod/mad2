@@ -1,16 +1,16 @@
-import Post from "../components/Post.js";
+import Postcard from "../components/Postcard.js";
 
 export default {
     template: `
     <div class='p-4'>
-        <h1>blogs list</h1>
-        <Post v-for="post in posts" :service='post.service' :author_id='post.user_id' :post_id='post.id' />
+        <h1>Services List</h1>
+        <Postcard v-for="service in services" :key="service.id" :service='service.service' :name='service.name' :post_id='service.id' />
     </div>
     `,
 
     data() {
         return {
-            posts: [],
+            services: [],
         };
     },
 
@@ -23,9 +23,9 @@ export default {
             },
         });
 
-        this.posts = await res.json();
+        this.services = await res.json();
     },
     components: {
-        Post,
+        Postcard,
     },
 };

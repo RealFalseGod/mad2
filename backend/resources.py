@@ -10,6 +10,7 @@ api = Api(prefix="/api")
 
 post_fields = {
     "id": fields.Integer,
+    "name": fields.String,
     "service": fields.String,
     "content": fields.String,
     "user_id": fields.Integer,
@@ -17,6 +18,7 @@ post_fields = {
 
 
 class post_api(Resource):
+
     @auth_required("token")
     @cache.memoize(timeout=5)
     @marshal_with(post_fields)
@@ -26,6 +28,7 @@ class post_api(Resource):
         if not post_instance:
             return {"message": "Post not found"}, 404
         return post_instance
+    
 
     @auth_required("token")
     def delete(self, post_id):
@@ -55,13 +58,16 @@ class postlist_api(Resource):
     @marshal_with(post_fields)
     def get(self):
         posts = post.query.all()
-        return posts
+        
+        services = [{"id": post.id,"service": post.service, "content": post.content, "user_id": post.user_id, "name":post.name} for post in posts]
+        return services
 
     @auth_required("token")
     def post(self):  # Create a new post
         data = request.get_json()
 
         new_post = post(
+            name = data.get("name"),
             service=data.get("service"),
             content=data.get("content"),
             user_id=current_user.id,

@@ -43,6 +43,7 @@ class UserRoles(db.Model):
 class post(db.Model):
     __tablename__ = "posts"
     id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(80), nullable=False)
     service = db.Column(db.String(80), nullable=False)
     content = db.Column(db.String(), nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)

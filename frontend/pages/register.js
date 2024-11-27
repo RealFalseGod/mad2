@@ -40,8 +40,7 @@ export default {
         method: "POST",
       });
       if (res.ok) {
-        console.log("we are registered in sir");       
-        
+        console.log("we are registered in sir");
       }
     },
   },

@@ -4,10 +4,11 @@ export default {
 
     template: `
     <div>
-        <h1>post view page</h1>          
-        <h2>{{post.service}}</h2>      
-        <p>{{post.user_id}}</p>
+        <h1>post view page</h1>   
+        <br />       
+        <h2>{{post.name}}</h2>      
         <p>{{post.content}}</p>
+        
     </div>
     
     `,
