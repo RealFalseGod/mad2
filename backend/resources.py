@@ -23,6 +23,7 @@ user_fields = {
     "address": fields.String,
     "pincode": fields.String,
     "roles": fields.List(fields.String(attribute="name")),
+    "active": fields.Boolean,
 }
 
 
@@ -34,7 +35,41 @@ class user_list(Resource):
             return {"message": "You are not authorized to view this resource"}, 403
         else:
             users = User.query.all()
+            # print(users)
             return users 
+        
+    @auth_required("token")
+    def delete(self, user_id):
+        if not current_user.has_role("admin") and current_user.id != 1:
+            return {"message": "You are not authorized to delete this resource"}, 403
+        else:
+            user_instance = User.query.get(user_id)
+            if not user_instance:
+                return {"message": "no User found"}, 404
+            try:
+                db.session.delete(user_instance)
+                db.session.commit()
+                return {"message": "User deleted successfully"}, 204
+            except:
+                db.session.rollback()
+                return {"message": "Error deleting user"}, 500
+            
+    @auth_required("token")
+    def put(self, user_id):
+        if not current_user.has_role("admin"):
+            return {"message": "You are not authorized to update this resource"}, 403
+        if user_id == 1:
+            return {"message": "You cannot update the admin user"}, 403
+        user = User.query.get(user_id)
+        if not user:
+            return {"message": "User not found"}, 404
+        try:
+            user.active = not user.active
+            db.session.commit()
+            return {"message": "User status updated successfully"}, 200
+        except:
+            db.session.rollback()
+            return {"message": "Error updating user status"}, 500
     
 
 class post_api(Resource):
@@ -128,6 +163,7 @@ class postlist_api(Resource):
      
             
         
-api.add_resource(user_list, "/users")
+api.add_resource(user_list, "/users", endpoint="users_list")
+api.add_resource(user_list, "/users/<int:user_id>", endpoint="users_details")
 api.add_resource(post_api, "/posts/<int:post_id>")
 api.add_resource(postlist_api, "/posts")
