@@ -49,6 +49,29 @@ class post_api(Resource):
             return {"message": "You are not authorized to delete this post"}, 403
 
         return {"message": "Post deleted"}, 204
+    
+    @auth_required("token")   
+    def put(self, post_id):
+        data =request.get_json()
+        post_instance = post.query.get(post_id)
+
+        if not post_instance:
+            return {"message": "Post not found"}, 404
+        
+        if post_instance.user_id == current_user.id:
+            try:
+                post_instance.name = data.get("name")
+                post_instance.service = data.get("service")
+                post_instance.content = data.get("content")
+                db.session.commit()
+                cache.delete_memoized(post_api.get, post_id)  # Clear the cache after updating a post
+                cache.delete("post_list")  # Clear the cache for the post list
+                return {"message": "Post updated"}, 200
+            except:
+                db.session.rollback()
+                return {"message": "Error updating post"}, 500
+        else:
+            return {"message": "You are not authorized to update this post"}, 403  
 
 
 class postlist_api(Resource):
@@ -80,6 +103,11 @@ class postlist_api(Resource):
         except:
             db.session.rollback()
             return {"message": "Error creating post"}, 500
+        
+
+     
+            
+        
 
 
 api.add_resource(post_api, "/posts/<int:post_id>")

@@ -10,6 +10,7 @@ import post_display from "../pages/post_display.js";
 import admin_page from "../pages/admin_page.js";
 import store from "./store.js";
 import create_post from "../pages/create_post.js";
+import edit_post from "../pages/edit_post.js";
 
 
 const routes = [
@@ -20,6 +21,7 @@ const routes = [
     { path: "/posts/:id", component: post_display, props: true, meta: { requiresAuth: true } },
     { path: "/admin-dashboard", component: admin_page, meta: { requiresAuth: true, role : 'admin' } },
     { path: "/create-post", component: create_post, meta: { requiresAuth: true, role : 'staff' } },
+    { path: "/edit-post/:id", component: edit_post, props: true, meta: { requiresAuth: true, role : 'staff' } },
 
 
 

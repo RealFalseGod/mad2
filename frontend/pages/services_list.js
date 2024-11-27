@@ -23,6 +23,15 @@ export default {
   },
 
   methods: {
+    async fetchServices() {
+        const res = await fetch(location.origin + "/api/posts", {
+            headers: {
+                "auth-token": this.$store.state.auth_token,
+            },
+        });
+        this.services = await res.json();
+    },
+
     deletepost(post_id) {
         // Filter out the deleted post from the services array
         this.services = this.services.filter(service => service.id !== post_id);
@@ -30,13 +39,7 @@ export default {
   },
 
   async mounted() {
-    const res = await fetch(location.origin + "/api/posts", {
-      headers: {
-        "auth-token": this.$store.state.auth_token,
-      },
-    });
-
-    this.services = await res.json();
+    await this.fetchServices();
   },
   components: {
     Postcard,
