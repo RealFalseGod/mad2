@@ -13,7 +13,7 @@ export default {
     `,
     computed: {
         can_delete() {
-            return (this.$store.state.user_id === this.author_id);
+            return this.$store.state.role === 'admin' || (this.$store.state.user_id === this.author_id);
         }
     },
     methods: {
@@ -27,7 +27,6 @@ export default {
             if (res.ok) {
                 alert("Post deleted successfully!");
                 this.$emit('postDeleted', this.post_id); // Emit an event to notify parent component
-                // this.$router.push('/services')
             } else {
                 alert("Post deletion failed!");
             }

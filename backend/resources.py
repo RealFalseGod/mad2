@@ -37,7 +37,7 @@ class post_api(Resource):
         if not post_instance:
             return {"message": "Post not found"}, 404
 
-        if post_instance.user_id == current_user.id:
+        if (post_instance.user_id == current_user.id) or current_user.has_role("admin"):
             try:
                 db.session.delete(post_instance)
                 db.session.commit()
