@@ -16,7 +16,7 @@ const store = new Vuex.Store({
                     state.auth_token = user.token;
                     state.role = user.role;
                     state.loggedin = true;
-                    state.user_id = user.user_id;
+                    state.user_id = user.id;
                 }
             } catch (e) {
                 console.warn("not logged in");
