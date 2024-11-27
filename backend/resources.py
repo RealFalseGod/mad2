@@ -2,7 +2,7 @@ from flask_restful import Api, Resource, fields, marshal_with
 from flask import request, current_app as app
 from backend.model import post
 from flask_security import auth_required, current_user
-from backend.model import db
+from backend.model import db, User
 
 cache = app.cache
 
@@ -16,6 +16,26 @@ post_fields = {
     "user_id": fields.Integer,
 }
 
+user_fields = {
+    "id": fields.Integer,
+    "username": fields.String,
+    "email": fields.String,
+    "address": fields.String,
+    "pincode": fields.String,
+    "roles": fields.List(fields.String(attribute="name")),
+}
+
+
+class user_list(Resource):
+    @auth_required("token")
+    @marshal_with(user_fields)
+    def get(self):
+        if not current_user.has_role("admin"):
+            return {"message": "You are not authorized to view this resource"}, 403
+        else:
+            users = User.query.all()
+            return users 
+    
 
 class post_api(Resource):
 
@@ -108,7 +128,6 @@ class postlist_api(Resource):
      
             
         
-
-
+api.add_resource(user_list, "/users")
 api.add_resource(post_api, "/posts/<int:post_id>")
 api.add_resource(postlist_api, "/posts")

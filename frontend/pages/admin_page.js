@@ -3,6 +3,9 @@ export default {
         <div>
             <h1>Admin Dashboard</h1>
             <button @click='create_csv' > get blogs data </button>
+            <button @click='$router.push("/admin-summary")' class='btn btn-secondary'>View Summary</button>
+
+
         </div>
     `,
 

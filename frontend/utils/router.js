@@ -11,6 +11,7 @@ import admin_page from "../pages/admin_page.js";
 import store from "./store.js";
 import create_post from "../pages/create_post.js";
 import edit_post from "../pages/edit_post.js";
+import summary from "../pages/summary.js";
 
 
 const routes = [
@@ -22,7 +23,7 @@ const routes = [
     { path: "/admin-dashboard", component: admin_page, meta: { requiresAuth: true, role : 'admin' } },
     { path: "/create-post", component: create_post, meta: { requiresAuth: true, role : 'staff' } },
     { path: "/edit-post/:id", component: edit_post, props: true, meta: { requiresAuth: true, role : 'staff' } },
-
+    { path: "/admin-summary", component: summary, meta: { requiresAuth: true, role : 'admin' } },
 
 
 ];
