@@ -17,3 +17,7 @@ def create_csv(self):
         file.write(csv_out.data)
     
     return filename
+
+@shared_task(ignore_result = False)
+def email(to,subject,content):
+    send_email(to,subject,content)

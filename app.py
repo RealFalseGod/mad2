@@ -42,9 +42,12 @@ app = create_app()
 
 celery_app = celery_init_app(app)
 
+import backend.celery.schedule 
+
 import backend.innit
 
 from backend.routes import *
+
 
 excel.init_excel(app)
 
