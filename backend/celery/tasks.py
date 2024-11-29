@@ -2,7 +2,7 @@ from celery import shared_task
 import time
 import flask_excel
 from backend.model import post
-from backend.celery.mail_service import send_emails
+from backend.celery.mail_service import send_email
 
 
 @shared_task(bind = True, ignore_result = False)
@@ -21,4 +21,4 @@ def create_csv(self):
 
 @shared_task(ignore_result = False)
 def email(to,subject,content):
-    send_emails(to,subject,content)
+    send_email(to,subject,content)
