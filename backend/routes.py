@@ -2,7 +2,6 @@ from flask import current_app as app, request, jsonify, render_template, send_fi
 from flask_security import auth_required, verify_password, hash_password
 from backend.model import db
 from datetime import datetime
-from backend.celery.tasks import add
 from celery.result import AsyncResult
 from backend.celery.tasks import create_csv
 
@@ -15,10 +14,12 @@ cache = app.cache
 def home():
     return render_template("index.html")
 
-
+@auth_required("token")
 @app.get('/getcsv/<id>')
 def getCSV(id):
     result = AsyncResult(id)
+    print(result)
+    print(result.ready())
 
     if result.ready():
         filename = result.result
@@ -33,10 +34,6 @@ def createCSV():
     task = create_csv.delay()
     return {'task_id' : task.id}, 200
 
-@app.get("/celery")
-def celery():
-    task = add.delay(10,20)
-    return {"task_id" : task.id}, 200
 
 @app.get('/getdata/<id>')
 def getdata(id):

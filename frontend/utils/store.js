@@ -30,7 +30,6 @@ const store = new Vuex.Store({
             state.user_id = null;
 
             localStorage.removeItem("user");
-            
         },
     },
     actions: {
@@ -38,7 +37,6 @@ const store = new Vuex.Store({
         // actions commits mutations
     },
 });
-
 
 store.commit("setUser");
 

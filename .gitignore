@@ -1,2 +1,5 @@
-.venv
 instance
+__pycache__
+backend/celery/__pycache__
+backend/__pycache__
+.venv

@@ -10,6 +10,7 @@ class local(config):
     SECURITY_PASSWORD_SALT = "wowsecrettobypassattack"
     SECRET_KEY = "veryverysecretkey"
     SECURITY_TOKEN_AUTHENTICATION_HEADER = "auth-token"
+    SECURITY_LOGIN_URL = '/login'
 
     #cache specification
     CACHE_TYPE = "RedisCache"

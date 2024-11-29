@@ -27,6 +27,7 @@ export default {
             if (res.ok) {
                 alert("Post deleted successfully!");
                 this.$emit('postDeleted', this.post_id); // Emit an event to notify parent component
+
             } else {
                 alert("Post deletion failed!");
             }
