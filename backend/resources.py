@@ -15,6 +15,7 @@ post_fields = {
     "name": fields.String,
     "service": fields.String,
     "content": fields.String,
+    "price": fields.Integer,
     "user_id": fields.Integer,
 }
 
@@ -129,6 +130,7 @@ class post_api(Resource):
                 post_instance.name = data.get("name")
                 post_instance.service = data.get("service")
                 post_instance.content = data.get("content")
+                post_instance.price = data.get("price") 
                 db.session.commit()
                 cache.delete_memoized(post_api.get, post_id)  # Clear the cache after updating a post
                 cache.delete("post_list")  # Clear the cache for the post list
@@ -159,6 +161,7 @@ class postlist_api(Resource):
             name = data.get("name"),
             service=data.get("service"),
             content=data.get("content"),
+            price=data.get("price"),
             user_id=current_user.id,
         )
         try:

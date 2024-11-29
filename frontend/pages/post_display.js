@@ -8,6 +8,7 @@ export default {
         <br />       
         <h2>{{post.name}}</h2>      
         <p>{{post.content}}</p>
+        <p>Price: ₹{{post.price}}</p>
 
         <div v-if="$store.state.role === 'user' ">
             <input type="date" v-model="booking_date" class="form-control mb-3" />

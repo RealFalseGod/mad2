@@ -46,6 +46,7 @@ class post(db.Model):
     name = db.Column(db.String(80), nullable=False)
     service = db.Column(db.String(80), nullable=False)
     content = db.Column(db.String(), nullable=False)
+    price = db.Column(db.Integer, nullable=False) 
     user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
 
     def __repr__(self):

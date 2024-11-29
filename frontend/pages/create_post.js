@@ -8,6 +8,7 @@ export default {
             <input placeholder='Name' v-model='name' />
             <input placeholder='Service' v-model='service' />
             <input placeholder='description' v-model='content' /> 
+            <input type="number" placeholder='Price' v-model='price' step="1" />
             <button  class='btn btn-primary' @click='createPost'>Create Post</button>  
 
         </div>    
@@ -17,6 +18,7 @@ export default {
             name: '',
             content: '',
             service: '',
+            price: 0,
         }
     },
     methods: {
@@ -31,6 +33,7 @@ export default {
                     name: this.name,
                     content: this.content,
                     service: this.service,
+                    price: this.price,
                 }),
             });
             if (res.ok) {

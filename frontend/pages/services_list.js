@@ -12,6 +12,7 @@ export default {
             :name='service.name' 
             :post_id='service.id'
             :author_id='service.user_id'
+            :price='service.price'
             @postDeleted="deletepost"
          />
     </div>
