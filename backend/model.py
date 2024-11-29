@@ -51,3 +51,14 @@ class post(db.Model):
     def __repr__(self):
         return f"<post(id={self.id}, service='{self.service}', content='{self.content}')>"
 
+class servicebooking(db.Model):
+    __tablename__ = "servicebooking"
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
+    post_id = db.Column(db.Integer, db.ForeignKey("posts.id"), nullable=False)
+    booking_date = db.Column(db.DateTime, nullable=False)
+
+    user = db.relationship("User", backref="service_booking")
+    post = db.relationship("post", backref="service_booking")
+    def __repr__(self):
+        return f"<servicebooking(id={self.id}, service='{self.service}', content='{self.content}')>"

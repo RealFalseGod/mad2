@@ -5,6 +5,7 @@ const store = new Vuex.Store({
         role: null,
         loggedin: false,
         user_id: null,
+        user_name: null,
     },
     mutations: {
         // its like methods with state change
@@ -17,6 +18,7 @@ const store = new Vuex.Store({
                     state.role = user.role;
                     state.loggedin = true;
                     state.user_id = user.id;
+                    state.user_name = user.username;
                 }
             } catch (e) {
                 console.warn("not logged in");

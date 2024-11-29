@@ -1,8 +1,9 @@
 from flask_restful import Api, Resource, fields, marshal_with
 from flask import request, current_app as app
-from backend.model import post
+from backend.model import post, servicebooking
 from flask_security import auth_required, current_user
 from backend.model import db, User
+from datetime import datetime
 
 cache = app.cache
 
@@ -25,6 +26,7 @@ user_fields = {
     "roles": fields.List(fields.String(attribute="name")),
     "active": fields.Boolean,
 }
+
 
 
 class user_list(Resource):
@@ -159,11 +161,34 @@ class postlist_api(Resource):
             db.session.rollback()
             return {"message": "Error creating post"}, 500
         
+class bookings(Resource):
+    def post(self):
+        data = request.get_json()
+        print(data)
+        user_id = current_user.id
+        post_id = data.get("post_id")
+        booking_date = datetime.strptime(data.get("booking_date"), "%Y-%m-%d")
 
-     
-            
+        if not post_id or not booking_date:
+            return {"message": "Missing required fields"},
+
+        new_booking = servicebooking(
+            user_id = user_id,
+            post_id = post_id,
+            booking_date = booking_date,
+        )
+        try:
+            db.session.add(new_booking)
+            db.session.commit()
+            return {"message": "Booking created"}, 201
+        except:
+            db.session.rollback()
+            return {"message": "Error creating booking"}, 500
+
+        
         
 api.add_resource(user_list, "/users", endpoint="users_list")
 api.add_resource(user_list, "/users/<int:user_id>", endpoint="users_details")
 api.add_resource(post_api, "/posts/<int:post_id>")
 api.add_resource(postlist_api, "/posts")
+api.add_resource(bookings, "/book_service")
