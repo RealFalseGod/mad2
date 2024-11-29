@@ -17,7 +17,7 @@ export default {
                         <td>{{booking.username}}</td>
                         <td>{{booking.service}}</td>
                         <td>{{booking.post_name}}</td>
-                        <td>{{booking.booking_date}}</td>
+                        <td>{{formatDate(booking.booking_date)}}</td>
                     </tr>
             </table>
 
@@ -27,6 +27,12 @@ export default {
     data() {
         return {
             bookings: []
+        }
+    },
+    methods: {
+        formatDate(dateString) {
+            const options = { year: 'numeric', month: 'long', day: 'numeric' };
+            return new Date(dateString).toLocaleDateString(undefined, options);
         }
     },
 
