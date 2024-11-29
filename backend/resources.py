@@ -4,6 +4,7 @@ from backend.model import post, servicebooking
 from flask_security import auth_required, current_user
 from backend.model import db, User
 from datetime import datetime
+from dateutil.parser import parse as parse_date
 
 cache = app.cache
 
@@ -27,7 +28,15 @@ user_fields = {
     "active": fields.Boolean,
 }
 
-
+booking_fields = {
+    "id": fields.Integer,
+    "user_id": fields.Integer,
+    "post_id": fields.Integer,
+    "booking_date": fields.DateTime,
+    "username": fields.String(attribute="user.username"),
+    "service": fields.String(attribute="post.service"),
+    "post_name": fields.String(attribute="post.name"),
+}
 
 class user_list(Resource):
     @auth_required("token")
@@ -167,7 +176,8 @@ class bookings(Resource):
         print(data)
         user_id = current_user.id
         post_id = data.get("post_id")
-        booking_date = datetime.strptime(data.get("booking_date"), "%Y-%m-%d")
+        date= data.get("booking_date")
+        booking_date = parse_date(date)
 
         if not post_id or not booking_date:
             return {"message": "Missing required fields"},
@@ -185,10 +195,18 @@ class bookings(Resource):
             db.session.rollback()
             return {"message": "Error creating booking"}, 500
 
-        
+class booking_list(Resource):
+    @auth_required("token")
+    @marshal_with(booking_fields)
+    def get(self):
+        if not current_user.has_role("admin"):
+            return {"message": "You are not authorized to view this resource"},
+        bookings = servicebooking.query.all()
+        return bookings           
         
 api.add_resource(user_list, "/users", endpoint="users_list")
 api.add_resource(user_list, "/users/<int:user_id>", endpoint="users_details")
 api.add_resource(post_api, "/posts/<int:post_id>")
 api.add_resource(postlist_api, "/posts")
 api.add_resource(bookings, "/book_service")
+api.add_resource(booking_list, "/bookings")
