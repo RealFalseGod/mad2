@@ -31,6 +31,9 @@ export default {
                 
                 this.$store.commit('setUser')
                 this.$router.push('/services')
+            }else{
+                const err = await res.json()
+                alert(err.error || "Login failed");
             }
         },
     },

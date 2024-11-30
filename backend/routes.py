@@ -44,10 +44,10 @@ def getdata(id):
     else:
         return {"status": "Processing"}, 202
 
-@app.get("/cache")
-@cache.cached(timeout=5)
-def cache():
-    return{'time': str(datetime.now()) }
+# @app.get("/cache")
+# @cache.cached(timeout=5)
+# def cache():
+#     return{'time': str(datetime.now()) }
 
 @app.route("/login", methods=["POST"])
 def login():

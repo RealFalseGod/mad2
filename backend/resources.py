@@ -5,6 +5,7 @@ from flask_security import auth_required, current_user
 from backend.model import db, User
 from datetime import datetime
 from dateutil.parser import parse as parse_date
+from backend.celery.tasks import email
 
 cache = app.cache
 
@@ -62,7 +63,7 @@ class user_list(Resource):
                 db.session.delete(user_instance)
                 db.session.commit()
                 return {"message": "User deleted successfully"}, 204
-            except:
+            except Exception as e:
                 db.session.rollback()
                 return {"message": "Error deleting user"}, 500
             
@@ -176,7 +177,7 @@ class postlist_api(Resource):
 class bookings(Resource):
     def post(self):
         data = request.get_json()
-        print(data)
+        # print(data)
         user_id = current_user.id
         post_id = data.get("post_id")
         date= data.get("booking_date")
@@ -193,9 +194,22 @@ class bookings(Resource):
         try:
             db.session.add(new_booking)
             db.session.commit()
+
+            user = User.query.get(user_id)
+            post_ins = post.query.get(post_id)
+            subject = "Booking confirmed"
+            content = f"""
+            <h1>Booking Confirmed</h1>
+            <p>Dear {user.username},</p>
+            <p>Your booking for the service <strong>{post_ins.name}</strong> has been confirmed.</p>
+            <p>Booking Date: {booking_date.strftime('%Y-%m-%d')}</p>
+            <p>Thank you for using our service!</p>
+            """
+            email.delay(user.email, subject, content)
             return {"message": "Booking created"}, 201
-        except:
+        except Exception as e:
             db.session.rollback()
+            
             return {"message": "Error creating booking"}, 500
 
 class booking_list(Resource):

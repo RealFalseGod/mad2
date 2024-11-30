@@ -19,4 +19,4 @@ def send_email(to,subject,content):
         client.send_message(msg)
         client.quit()
 
-send_email('piu@gmail.com','test mail','<h1>hello</h1>')
+# send_email('piu@gmail.com','test mail','<h1>hello</h1>')
