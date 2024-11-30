@@ -38,6 +38,7 @@ booking_fields = {
     "username": fields.String(attribute="user.username"),
     "service": fields.String(attribute="post.service"),
     "post_name": fields.String(attribute="post.name"),
+    "name":field.String(a)
 }
 
 class user_list(Resource):
@@ -197,7 +198,16 @@ class bookings(Resource):
 
         if not post_id or not booking_date:
             return {"message": "Missing required fields"},
+        post_count = servicebooking.query.filter_by(user_id=user_id).count() 
+        print(post_count,1111)
+        if post_count<=5:
+             return {"message": "Cant book more than 5 services"}, 500
+        existing_booking = servicebooking.query.filter_by(
+            user_id=user_id, post_id=post_id, booking_date=booking_date
+        ).first()
 
+        if existing_booking:
+            return {"message": "You have already booked this service on this day"}, 400
         new_booking = servicebooking(
             user_id = user_id,
             post_id = post_id,
@@ -231,7 +241,70 @@ class booking_list(Resource):
         if not current_user.has_role("admin"):
             return {"message": "You are not authorized to view this resource"},
         bookings = servicebooking.query.all()
-        return bookings           
+        return bookings     
+
+class services_by_staff(Resource):
+    @auth_required("token")
+    @marshal_with(post_fields)
+    def get(self, staff_id):
+        # Ensure only admin or the staff member can access this data
+        if not current_user.has_role("admin") and current_user.id != staff_id:
+            return {"message": "You are not authorized to view this resource"}, 403
+        
+        posts = post.query.filter_by(user_id=staff_id).all()
+        if not posts:
+            return {"message": "No services found for this staff"}, 404
+        
+        return posts, 200    
+class bookings_by_user(Resource):
+    @auth_required("token")
+    @marshal_with(booking_fields)
+    def get(self, user_id):
+        print(1)
+        # Ensure only admin or the user can access this data
+        if current_user.has_role("admin"):
+            print(1)
+            # If the user is admin or accessing their own bookings, get the bookings
+            bookings = servicebooking.query.filter_by(user_id=user_id).all()
+        elif current_user.has_role("staff"):
+            print(1)
+            # If the user is staff, fetch bookings for posts created by the staff
+            bookings = db.session.query(servicebooking).join(post, post.id == servicebooking.post_id).filter(post.user_id == current_user.id).all()
+        else:
+            return {"message": "You are not authorized to view this resource"}, 403
+        
+        if not bookings:
+            return {"message": "No bookings found for this user"}, 101
+        
+        result = []
+        for booking in bookings:
+            # Use a single query to fetch both 'service' and 'name'
+            post_details = db.session.query(post.service, post.name).filter(post.id == booking.post_id).first()
+            user_name = db.session.query(User.username).filter(User.id == booking.user_id).first()
+            print(post_details.name)
+            # Ensure to handle the case when post_details or user_name is None
+            if post_details:
+                service = post_details.service
+                name = post_details.name
+            
+            user_name = user_name[0] if user_name else 'N/A'
+            booking_date = booking.booking_date if isinstance(booking.booking_date, datetime) else datetime.strptime(booking.booking_date, '%Y-%m-%d')
+            print(user_name)
+            # Prepare booking info
+            booking_info = {
+                'booking_id': booking.id,
+                'booking_date': booking_date,
+                'service': service,  # Service name
+                'name': name,        # Service name
+                'user_name': user_name,  # User who made the booking
+            }
+            result.append(booking_info)
+            print(booking_info)
+        print(result) 
+        return result, 200
+
+
+        
         
 api.add_resource(user_list, "/users", endpoint="users_list")
 api.add_resource(get_user, "/user/<int:user_id>")
@@ -239,5 +312,7 @@ api.add_resource(post_api, "/posts/<int:post_id>")
 api.add_resource(postlist_api, "/posts")
 api.add_resource(bookings, "/book_service")
 api.add_resource(booking_list, "/bookings")
+api.add_resource(services_by_staff, "/staff/<int:staff_id>/services")
+api.add_resource(bookings_by_user, "/bookings/<int:user_id>")
 
 

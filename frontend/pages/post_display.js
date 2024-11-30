@@ -15,6 +15,8 @@ export default {
                 type="date" 
                 v-model="booking_date" 
                 class="form-control mb-3" 
+                :min="minDate"
+                placeholder="Select a date"
             />
             <button class="btn btn-primary" @click="bookservice">Book Service</button>
         </div>
@@ -29,6 +31,7 @@ export default {
     },
 
     async mounted() {
+        
         const res = await fetch(`${location.origin}/api/posts/${this.id}`, {
             headers: {
                 "auth-token": this.$store.state.auth_token,
@@ -55,8 +58,20 @@ export default {
             if (res.ok) {
                 alert("Service booked successfully");
             } else {
-                alert("Failed to book service");
+                const errorData = await res.json();
+                alert(`${errorData.message || "Unknown error"}`);
             }
         },
-    }
+            
+    },
+    computed: {
+        minDate() {
+          const today = new Date();
+          const year = today.getFullYear();
+          const month = String(today.getMonth() + 1).padStart(2, '0');  // Ensure two-digit month
+          const day = String(today.getDate()).padStart(2, '0');  // Ensure two-digit day
+          return `${year}-${month}-${day}`;  // Return in the format YYYY-MM-DD
+        },
+      }
+    
 }

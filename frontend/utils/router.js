@@ -13,8 +13,8 @@ import create_post from "../pages/create_post.js";
 import edit_post from "../pages/edit_post.js";
 import summary from "../pages/summary.js";
 import bookings from "../pages/bookings.js";
-//import info from "../pages/info.js";
-
+import info from "../pages/info.js";
+import view_request from "../pages/view_request.js";
 
 const routes = [
     { path: "/", component: home },
@@ -27,9 +27,8 @@ const routes = [
     { path: "/edit-post/:id", component: edit_post, props: true, meta: { requiresAuth: true, role : 'staff' } },
     { path: "/admin-summary", component: summary, meta: { requiresAuth: true, role : 'admin' } },
     { path: "/admin-bookings", component: bookings, meta: { requiresAuth: true, role : 'admin' } },
-    //{ path: "/info", component: info, meta: { requiresAuth: true, role : 'admin' } },
-
-
+    { path: "/info/:id", component: info, props: true, meta: { requiresAuth: true, role : 'admin' } },
+    { path: "/view_request", component: view_request, meta: { requiresAuth: true, role : 'staff' } },
 ];
 
 const router = new VueRouter({ routes });

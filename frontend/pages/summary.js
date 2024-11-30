@@ -29,7 +29,7 @@ export default {
                 <tr v-for="user in filteredUsers" :key="user.id" >
                     
                     <td >{{ user.id }}</td>
-                    <td @click="$router.push('/')">{{ user.username }}</td>
+                    <td  @click="$router.push('/info/' + user.id)">{{ user.username }}</td>
                     <td>{{ user.email }}</td>
                     <td>{{ user.address }}</td>
                     <td>{{ user.pincode }}</td>
