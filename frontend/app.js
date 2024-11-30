@@ -6,16 +6,28 @@ const app = new Vue({
     el: "#app",
     template: `
         <div>
-            <h3>welcome {{$store.state.user_name}}</h3>
-            <h1><Navbar /></h1>
             
-            <router-view> </router-view>
+            <!-- Navbar Component -->
+            <h1><Navbar /></h1>
+            <!-- Conditional rendering for the welcome message -->
+            <h3 v-if="isLoggedIn" class="welcome-message">Welcome, {{ $store.state.user_name }}</h3>
+            
+            <!-- Router View -->
+            <router-view></router-view>
         </div>
     `,
-
     components: {
         Navbar,
     },
     router,
     store,
+
+    computed: {
+        // Computed property to check if the user is logged in
+        isLoggedIn() {
+            // You can adjust this to check for a more appropriate flag in your store, 
+            // such as user authentication status
+            return !!this.$store.state.user_name; // Returns true if user_name is not null/undefined
+        }
+    }
 });

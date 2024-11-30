@@ -1,20 +1,40 @@
 export default {
   template: `
-    <div>
-        <input type="email" placeholder='email' v-model='email' />
-        <input placeholder='Username' v-model='username' />        
-        <input type="password" placeholder='password' v-model='password' />
-        <input placeholder='address' v-model='address' />
-        <input type="number" placeholder='pincode' v-model='pincode' />
-        <select v-model="role">
-            <option disabled value="">Select role</option>
-            <option value="user">User</option>
-            <option value="staff">Staff</option>
-        </select>
+    <div class="register-container">
+        <h2 class="register-title">Register</h2>
+        
+        <div class="form-group">
+            <input type="email" placeholder="Email" v-model="email" class="form-input" />
+        </div>
+        
+        <div class="form-group">
+            <input placeholder="Username" v-model="username" class="form-input" />
+        </div>
 
-        <button class='btn btn-primary' @click="submitLogin"> register </button>
+        <div class="form-group">
+            <input type="password" placeholder="Password" v-model="password" class="form-input" />
+        </div>
+
+        <div class="form-group">
+            <input placeholder="Address" v-model="address" class="form-input" />
+        </div>
+
+        <div class="form-group">
+            <input type="number" placeholder="Pincode" v-model="pincode" class="form-input" />
+        </div>
+
+        <div class="form-group">
+        <h3 class="register-title">Select Role</h3>
+            <select v-model="role" class="form-input">
+            <option disabled value="">Select role</option>
+                <option value="user">User</option>
+                <option value="staff">Staff</option>
+            </select>
+        </div>
+
+        <button class="btn btn-primary" @click="submitLogin">Register</button>
     </div>
-      `,
+  `,
   data() {
     return {
       username: null,
@@ -40,8 +60,8 @@ export default {
         method: "POST",
       });
       if (res.ok) {
-        console.log("we are registered in sir");
-        $router.push("/login");
+        console.log("Registration successful");
+        this.$router.push('/login');
       }
     },
   },

@@ -1,9 +1,10 @@
 export default {
     template: `
-    <div>
-        <input placeholder='email' v-model='email' />
-        <input placeholder='password' type='password' v-model='password' />
-        <button class='btn btn-primary' @click="submitLogin"> Login </button>
+    <div class="login-container">
+    <h2 class="login-title">Login</h2> <!-- Login Title -->
+        <input placeholder='email' v-model='email' class="login-input" />
+        <input placeholder='password' type='password' v-model='password' class="login-input" />
+        <button class='btn btn-primary' @click="submitLogin" class="login-btn">Login</button>
     </div>
       `,
     data() {
