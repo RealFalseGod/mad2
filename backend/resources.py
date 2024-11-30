@@ -109,14 +109,16 @@ class post_api(Resource):
             try:
                 db.session.delete(post_instance)
                 db.session.commit()
+                
                 cache.delete_memoized(self.get, post_id)  # Clear the cache after deleting a post
+                return {"message": "Post deleted"}, 204
             except:
                 db.session.rollback()
                 return {"message": "Error deleting post"}, 500
         else:
             return {"message": "You are not authorized to delete this post"}, 403
 
-        return {"message": "Post deleted"}, 204
+        
     
     @auth_required("token")   
     def put(self, post_id):
@@ -126,7 +128,7 @@ class post_api(Resource):
         if not post_instance:
             return {"message": "Post not found"}, 404
         
-        if post_instance.user_id == current_user.id:
+        if (post_instance.user_id == current_user.id) or current_user.has_role("admin"):
             try:
                 post_instance.name = data.get("name")
                 post_instance.service = data.get("service")
@@ -151,7 +153,12 @@ class postlist_api(Resource):
     def get(self):
         posts = post.query.all()
         
-        services = [{"id": post.id,"service": post.service, "content": post.content, "user_id": post.user_id, "name":post.name} for post in posts]
+        services = [{"id": post.id,
+                     "service": post.service, 
+                     "content": post.content, 
+                     "user_id": post.user_id, 
+                     "name":post.name} 
+                     for post in posts]
         return services
 
     @auth_required("token")

@@ -2,13 +2,13 @@ const home = {
     template: `<h1>this is home from router js</h1>
     `,
 };
+import store from "./store.js";
 
 import login from "../pages/login.js";
 import register from "../pages/register.js";
 import services_list from "../pages/services_list.js";
 import post_display from "../pages/post_display.js";
 import admin_page from "../pages/admin_page.js";
-import store from "./store.js";
 import create_post from "../pages/create_post.js";
 import edit_post from "../pages/edit_post.js";
 import summary from "../pages/summary.js";

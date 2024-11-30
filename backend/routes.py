@@ -80,10 +80,6 @@ def login():
 
     return jsonify({"error": "Invalid email or password"}), 400
 
-@app.get("/protected")
-@auth_required("token")
-def protected():
-    return "<h1>Admin Page</h1>"
 
 @app.route("/register", methods=["POST"])
 def register():
