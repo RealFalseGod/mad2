@@ -1,39 +1,39 @@
 export default {
     template: `
-        <div class='p-4'>
-            <table class="table table-striped">
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Username</th>
-                        <th>Email</th>
-                        <th>Address</th>
-                        <th>Pincode</th>
-                        <th>Roles</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr v-for="user in users" :key="user.id">
-                        <td>{{user.id}}</td>
-                        <td>{{user.username}}</td>
-                        <td>{{user.email}}</td>
-                        <td>{{user.address}}</td>
-                        <td>{{user.pincode}}</td>
-                        <td>{{user.roles[0]}}</td>                        
-                        <td>
-                            <button 
-                                class="btn" 
-                                :class="user.active ? 'btn-outline-danger' : 'btn-outline-success'" 
-                                @click="toggleUserStatus(user.id)" 
-                                data-bs-toggle="button"                            >
-                                {{ user.active ? 'Ban' : 'Unban'  }}
-                            </button>
-                        </td>
-                    </tr>
-                </tbody>           
-            </table>
-        </div>
+    <div class="p-4">
+    <table class="table table-striped">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Username</th>
+          <th>Email</th>
+          <th>Address</th>
+          <th>Pincode</th>
+          <th>Roles</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr v-for="user in users" :key="user.id">
+          <td>{{ user.id }}</td>
+          <td>{{ user.username }}</td>
+          <td>{{ user.email }}</td>
+          <td>{{ user.address }}</td>
+          <td>{{ user.pincode }}</td>
+          <td>{{ user.roles[0] }}</td>
+          <td>
+            <button 
+              class="btn" 
+              :class="user.active ? 'btn-outline-danger' : 'btn-outline-success'" 
+              @click="toggleUserStatus(user.id)" 
+              data-bs-toggle="button">
+              {{ user.active ? 'Ban' : 'Unban' }}
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
     `,
 
     data() {

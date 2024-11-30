@@ -2,13 +2,27 @@ export default {
     props: ["service", "post_id", "name", "author_id", "price"],
 
     template: `
-    <div class="jumbotron">
-        <h1 @click='$router.push("/posts/"+ post_id)' >{{post_id}}. {{service}}</h1>
-        <h2>{{name}}</h2>
-       
-        <button class="btn btn-danger" v-if='can_delete' @click='deletepost'>Delete Post</button>
-        <button class="btn btn-outline-primary" v-if='can_delete' @click='$router.push("/edit-post/"+ post_id)'>Edit Post</button>
+    <div class="post-card">
+    <h1 @click="$router.push('/posts/' + post_id)" class="post-title">
+      {{ post_id }}. {{ service }}
+    </h1>
+    <h2 class="post-name">{{ name }}</h2>
+    
+    <div class="post-actions">
+      <button 
+        class="btn btn-danger" 
+        v-if="can_delete" 
+        @click="deletepost">
+        Delete Post
+      </button>
+      <button 
+        class="btn btn-outline-primary" 
+        v-if="can_delete" 
+        @click="$router.push('/edit-post/' + post_id)">
+        Edit Post
+      </button>
     </div>
+  </div>
     
     `,
     computed: {

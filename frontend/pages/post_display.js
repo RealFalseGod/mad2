@@ -3,19 +3,22 @@ export default {
     props: ["id"],
 
     template: `
-    <div>
-        <h1>post view page</h1>   
-        <br />       
-        <h2>{{post.name}}</h2>      
-        <p>{{post.content}}</p>
-        <p>Price: ₹{{post.price}}</p>
+    <div class="post-view">
+    <h1>Post View Page</h1>   
+    <br />
+    <h2>{{ post.name }}</h2>      
+    <p>{{ post.content }}</p>
+    <p>Price: ₹{{ post.price }}</p>
 
-        <div v-if="$store.state.role === 'user' ">
-            <input type="date" v-model="booking_date" class="form-control mb-3" />
-            <button class="btn btn-primary" @click="bookservice">Book Service</button>
-        </div>
-        
+    <div v-if="$store.state.role === 'user'">
+      <input 
+        type="date" 
+        v-model="booking_date" 
+        class="form-control mb-3" 
+      />
+      <button class="btn btn-primary" @click="bookservice">Book Service</button>
     </div>
+  </div>
     
     `,
     data() {

@@ -2,20 +2,25 @@ import Postcard from "../components/Postcard.js";
 
 export default {
     template: `
-    <div class='p-4'>
-        <h1>Services List</h1>
-        <input type="text" v-model="searchQuery" placeholder="Search services..." class="form-control mb-3" />
-        <Postcard 
-            v-for="service in filteredServices" 
-            :key="service.id" 
-            :service='service.service' 
-            :name='service.name' 
-            :post_id='service.id'
-            :author_id='service.user_id'
-            :price='service.price'
-            @postDeleted="deletepost"
-         />
+    <div class="container">
+    <h1>Services List</h1>
+    <input 
+      type="text" 
+      v-model="searchQuery" 
+      placeholder="Search services..." 
+      class="form-control mb-3" 
+    />
+    <div v-for="service in filteredServices" :key="service.id">
+      <Postcard 
+        :service="service.service" 
+        :name="service.name" 
+        :post_id="service.id" 
+        :author_id="service.user_id" 
+        :price="service.price"
+        @postDeleted="deletepost"
+      />
     </div>
+  </div>
     `,
 
     data() {

@@ -1,12 +1,13 @@
 export default {
     template: `
-        <div>
-            <h1>Admin Dashboard</h1>
-            <button @click='create_csv' > get blogs data </button>
-            <button @click='$router.push("/admin-summary")' class='btn btn-secondary'>View Summary</button>
-            <button @click='$router.push("/admin-bookings")' class='btn btn-secondary'>View Bookings</button>
-
-        </div>
+    <div class="admin-dashboard">
+    <h1 class="dashboard-title">Admin Dashboard</h1>
+    <div class="button-container">
+        <button @click="create_csv" class="btn btn-primary">Get Blogs Data</button>
+        <button @click="$router.push('/admin-summary')" class="btn btn-secondary">View Summary</button>
+        <button @click="$router.push('/admin-bookings')" class="btn btn-secondary">View Bookings</button>
+    </div>
+</div>
     `,
 
     methods: {
