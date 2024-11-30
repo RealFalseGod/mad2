@@ -5,16 +5,20 @@ import store from "./utils/store.js";
 const app = new Vue({
     el: "#app",
     template: `
-        <div>
-            
-            <!-- Navbar Component -->
-            <h1><Navbar /></h1>
-            <!-- Conditional rendering for the welcome message -->
-            <h3 v-if="isLoggedIn" class="welcome-message">Welcome, {{ $store.state.user_name }}</h3>
-            
-            <!-- Router View -->
-            <router-view></router-view>
-        </div>
+    <div>
+    <!-- Navbar Component -->
+    <h1>
+      <Navbar />
+    </h1>
+
+    <!-- Conditional rendering for the welcome message -->
+    <h3 v-if="$store.state.loggedin" class="welcome-message">
+      Welcome, {{ $store.state.user_name }}
+    </h3>
+
+    <!-- Router View -->
+    <router-view></router-view>
+  </div>
     `,
     components: {
         Navbar,

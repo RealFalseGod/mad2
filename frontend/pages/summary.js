@@ -1,44 +1,60 @@
 export default {
     template: `
     <div class="p-4">
-    <table class="table table-striped">
-      <thead>
-        <tr>
-          <th>ID</th>
-          <th>Username</th>
-          <th>Email</th>
-          <th>Address</th>
-          <th>Pincode</th>
-          <th>Roles</th>
-          <th>Actions</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr v-for="user in users" :key="user.id">
-          <td>{{ user.id }}</td>
-          <td>{{ user.username }}</td>
-          <td>{{ user.email }}</td>
-          <td>{{ user.address }}</td>
-          <td>{{ user.pincode }}</td>
-          <td>{{ user.roles[0] }}</td>
-          <td>
-            <button 
-              class="btn" 
-              :class="user.active ? 'btn-outline-danger' : 'btn-outline-success'" 
-              @click="toggleUserStatus(user.id)" 
-              data-bs-toggle="button">
-              {{ user.active ? 'Ban' : 'Unban' }}
-            </button>
-          </td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
+        <!-- Dropdown to select user type -->
+        <div class="mb-3">
+            <label for="userType" class="form-label">Select User Type</label>
+            <select v-model="selectedUserType" class="form-select" id="userType" @change="filterUsers">
+                <option value="all">All Users</option>
+                <option value="staff">Staff</option>
+                <option value="user">User</option>
+            </select>
+        </div>
+        
+        <!-- Table of users -->
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Username</th>
+                    <th>Email</th>
+                    <th>Address</th>
+                    <th>Pincode</th>
+                    <th>Roles</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+
+                <tr v-for="user in filteredUsers" :key="user.id" >
+                    
+                    <td >{{ user.id }}</td>
+                    <td @click="$router.push('/')">{{ user.username }}</td>
+                    <td>{{ user.email }}</td>
+                    <td>{{ user.address }}</td>
+                    <td>{{ user.pincode }}</td>
+                    <td>{{ user.roles[0] }}</td>
+                    
+                    <td>
+                        <button 
+                            class="btn" 
+                            :class="user.active ? 'btn-outline-danger' : 'btn-outline-success'" 
+                            @click="toggleUserStatus(user.id)" 
+                            data-bs-toggle="button">
+                            {{ user.active ? 'Ban' : 'Unban' }}
+                        </button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
     `,
 
     data() {
         return {
-            users: [],
+            users: [], // All users fetched from the API
+            filteredUsers: [], // Users filtered based on selected type
+            selectedUserType: 'all', // Default to showing all users
         };
     },
 
@@ -62,6 +78,15 @@ export default {
             } else {
                 alert(`Error ${user.active ? 'banning' : 'unbanning'} user.`);
             }
+        },
+
+        filterUsers() {
+            // Filter the users based on selected type
+            if (this.selectedUserType === 'all') {
+                this.filteredUsers = this.users;
+            } else {
+                this.filteredUsers = this.users.filter(user => user.roles.includes(this.selectedUserType));
+            }
         }
     },
 
@@ -71,11 +96,13 @@ export default {
                 "auth-token": this.$store.state.auth_token,
             },
         });
+
         if (!res.ok) {
             alert("You are not authorized to view this page!");
             this.$router.push("/login");
         } else {
             this.users = await res.json();
+            this.filterUsers(); // Filter users based on the default selected type
         }
     },
-}
+};

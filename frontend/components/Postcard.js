@@ -7,7 +7,6 @@ export default {
       {{ post_id }}. {{ service }}
     </h1>
     <h2 class="post-name">{{ name }}</h2>
-    
     <div class="post-actions">
       <button 
         class="btn btn-danger" 

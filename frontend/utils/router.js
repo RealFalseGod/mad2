@@ -13,19 +13,21 @@ import create_post from "../pages/create_post.js";
 import edit_post from "../pages/edit_post.js";
 import summary from "../pages/summary.js";
 import bookings from "../pages/bookings.js";
+//import info from "../pages/info.js";
 
 
 const routes = [
     { path: "/", component: home },
     { path: "/login", component: login },
     { path: "/register", component: register },
-    { path: "/services", component: services_list, meta: { requiresAuth: true } },
+    { path: "/services", component: services_list, meta: { requiresAuth: true} },
     { path: "/posts/:id", component: post_display, props: true, meta: { requiresAuth: true } },
     { path: "/admin-dashboard", component: admin_page, meta: { requiresAuth: true, role : 'admin' } },
     { path: "/create-post", component: create_post, meta: { requiresAuth: true, role : 'staff' } },
     { path: "/edit-post/:id", component: edit_post, props: true, meta: { requiresAuth: true, role : 'staff' } },
     { path: "/admin-summary", component: summary, meta: { requiresAuth: true, role : 'admin' } },
     { path: "/admin-bookings", component: bookings, meta: { requiresAuth: true, role : 'admin' } },
+    //{ path: "/info", component: info, meta: { requiresAuth: true, role : 'admin' } },
 
 
 ];

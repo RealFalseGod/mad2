@@ -30,14 +30,15 @@ const store = new Vuex.Store({
             state.role = null;
             state.loggedin = false;
             state.user_id = null;
-
             localStorage.removeItem("user");
         },
     },
     actions: {
-        // its like methods but async
-        // actions commits mutations
+        logout({ commit }) {
+            commit('logout');
+          }
     },
+    
 });
 
 store.commit("setUser");

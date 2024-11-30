@@ -83,6 +83,18 @@ class user_list(Resource):
         except:
             db.session.rollback()
             return {"message": "Error updating user status"}, 500
+class get_user(Resource):
+    @auth_required("token")
+    @marshal_with(user_fields)
+    def get(self,user_id):
+        if not current_user.has_role("admin"):
+            return {"message": "You are not authorized to view this resource"}, 403
+        else:
+            users = User.query.get(user_id)
+            # print(users)
+            return users 
+        
+    
     
 
 class post_api(Resource):
@@ -222,8 +234,10 @@ class booking_list(Resource):
         return bookings           
         
 api.add_resource(user_list, "/users", endpoint="users_list")
-api.add_resource(user_list, "/users/<int:user_id>", endpoint="users_details")
+api.add_resource(get_user, "/user/<int:user_id>")
 api.add_resource(post_api, "/posts/<int:post_id>")
 api.add_resource(postlist_api, "/posts")
 api.add_resource(bookings, "/book_service")
 api.add_resource(booking_list, "/bookings")
+
+

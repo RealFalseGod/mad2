@@ -2,16 +2,47 @@
 export default {
 
     template: `
-        <div>
-            
+    <div class="create-post-container dark-theme">
             <h1>Create Post</h1>
-            <input placeholder='Name' v-model='name' />
-            <input placeholder='Service' v-model='service' />
-            <input placeholder='description' v-model='content' /> 
-            <input type="number" placeholder='Price' v-model='price' step="1" />
-            <button  class='btn btn-primary' @click='createPost'>Create Post</button>  
-
-        </div>    
+            <div class="form-group">
+                <input 
+                    type="text" 
+                    placeholder="Name" 
+                    v-model="name" 
+                    class="form-control" 
+                />
+            </div>
+            <div class="form-group">
+                <input 
+                    type="text" 
+                    placeholder="Service" 
+                    v-model="service" 
+                    class="form-control" 
+                />
+            </div>
+            <div class="form-group">
+                <textarea 
+                    placeholder="Description" 
+                    v-model="content" 
+                    class="form-control" 
+                    rows="4">
+                </textarea>
+            </div>
+            <div class="form-group">
+                <input 
+                    type="number" 
+                    placeholder="Price" 
+                    v-model="price" 
+                    step="1" 
+                    class="form-control" 
+                />
+            </div>
+            <button 
+                class="btn btn-primary create-post-btn" 
+                @click="createPost">
+                Create Post
+            </button>
+        </div> 
     `,
     data() {
         return {
