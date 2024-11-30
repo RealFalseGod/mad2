@@ -41,7 +41,7 @@ export default {
       });
       if (res.ok) {
         console.log("we are registered in sir");
-        $router.push("/login");
+        this.$router.push('/login');
       }
     },
   },
