@@ -109,6 +109,7 @@ class user_list(Resource):
 
     @auth_required("token")
     def put(self, user_id):
+        print("ohhohoh")
         if not current_user.has_role("admin"):
             return {"message": "You are not authorized to update this resource"}, 403
         if user_id == 1:
@@ -520,6 +521,29 @@ class accept_booking(Resource):
             db.session.rollback()
             return {"message": f"Error accepting booking: {str(e)}"}, 500
 
+class cancel_booking(Resource):
+    @auth_required("token")
+    def put(self, booking_id):
+        print("halo")
+        booking = servicebooking.query.get(booking_id)
+        ser_user = User.query.get(booking.user_id)
+        if not booking:
+            return {"message": "Booking not found"}, 404
+        try:
+            booking.status = "canceled"  
+            db.session.commit()
+            subject = "Your Booking Has Been canceled"
+            content = f"""
+                <p>Dear {ser_user.username},</p>
+                <p>We regret to inform you that your booking (Booking ID: {booking.id}) for the services has been canceld.</p>
+                <p>If you have any questions or concerns, please contact us.</p>
+                <p>Best regards,<br>Your Service Team</p>
+            """
+            send_email(ser_user.email, subject, content)
+            return {"message": "Booking canceling successfully"}, 200
+        except Exception as e:
+            db.session.rollback()
+            return {"message": f"Error canceling booking: {str(e)}"}, 500
 
 class done_and_review(Resource):
     @auth_required("token")
@@ -563,7 +587,9 @@ class done_and_review(Resource):
             return {"message": f"Error review failed: {str(e)}"}, 500
 
 
+
 api.add_resource(user_list, "/users", endpoint="users_list")
+api.add_resource(user_list, "/users/<int:user_id>")
 api.add_resource(get_user, "/user/<int:user_id>")
 api.add_resource(post_api, "/posts/<int:post_id>")
 api.add_resource(postlist_api, "/posts")
@@ -573,6 +599,7 @@ api.add_resource(services_by_staff, "/staff/<int:staff_id>/services")
 api.add_resource(bookings_by_user, "/bookings/<int:user_id>")
 api.add_resource(reject_booking, "/bookings/reject/<int:booking_id>")
 api.add_resource(accept_booking, "/bookings/accept/<int:booking_id>")
+api.add_resource(cancel_booking, "/bookings/cancel/<int:booking_id>")
 api.add_resource(bookings_for_user, "/books")
 api.add_resource(done_and_review, "/review/<int:booking_id>")
 api.add_resource(postlist2, "/post_list")

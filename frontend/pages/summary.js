@@ -62,7 +62,7 @@ export default {
         async toggleUserStatus(user_id) {
             const user = this.users.find(user => user.id === user_id);
             if (!user) return;
-
+            console.log(location.origin + `/api/users/${user_id}`);
             const res = await fetch(location.origin + `/api/users/${user_id}`, {
                 method: 'PUT',
                 headers: {

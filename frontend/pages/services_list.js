@@ -1,50 +1,88 @@
 export default {
     template: `
-      <div>
-        <div v-if="posts.length === 0">Loading posts...</div>
-        <div v-else>
-          <table border="1" cellpadding="10" cellspacing="0">
-            <thead>
-              <tr>
-                <th>Post Name</th>
-                <th>Service</th>
-                <th>Content</th>
-                <th>Price</th>
-                <th>Created By</th>
-                <th>Total Jobs</th>
-                <th>Average Stars</th>
-                <th>Address</th> <!-- Added Address column -->
-                <th>Pincode</th> <!-- Added Pincode column -->
-                <th>Booking Date</th>
-                <th>Action</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr v-for="post in posts" :key="post.id">
-                <td>{{ post.name }}</td>
-                <td>{{ post.service }}</td>
-                <td>{{ post.content }}</td>
-                <td>{{ post.price }}</td>
-                <td>{{ post.username }}</td>
-                <td>{{ post.total_jobs }}</td>
-                <td>{{ post.average_stars }}</td>
-                <td>{{ post.address }}</td> <!-- Display Address -->
-                <td>{{ post.pincode }}</td> <!-- Display Pincode -->
-                <td>
-                  <input type="date" v-model="post.bookingDate" :min="minDate" />
-                </td>
-                <td>
-                  <button @click="bookService(post)">Book</button> <!-- Pass the post to the method -->
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
+    <div>
+    <!-- Search Bar with options for pincode, service, or user -->
+    <div>
+      <label for="searchOption">Search by:</label>
+      <select v-model="searchOption" id="searchOption">
+        <option value="pincode">Pincode</option>
+        <option value="service">Service</option>
+        <option value="user">User</option>
+      </select>
+
+      <!-- Search input based on selected option -->
+      <input 
+        v-if="searchOption === 'pincode'" 
+        v-model="searchQuery" 
+        type="text" 
+        placeholder="Enter Pincode" 
+      />
+      
+      <input 
+        v-if="searchOption === 'service'" 
+        v-model="searchQuery" 
+        type="text" 
+        placeholder="Enter Service" 
+      />
+      
+      <input 
+        v-if="searchOption === 'user'" 
+        v-model="searchQuery" 
+        type="text" 
+        placeholder="Enter User" 
+      />
+
+      <button @click="filterPosts">Search</button>
+    </div>
+
+    <!-- Table with Posts -->
+    <div v-if="posts.length === 0">Loading posts...</div>
+    <div v-else>
+    <table border="1" cellpadding="10" cellspacing="0">
+    <thead>
+      <tr>
+        <th>Post Name</th>
+        <th>Service</th>
+        <th>Content</th>
+        <th>Price</th>
+        <th>Created By</th>
+        <th>Total Jobs</th>
+        <th>Average Stars</th>
+        <th>Pincode</th> <!-- Added pincode column -->
+        <th>Address</th> <!-- Added address column -->
+        <th>Booking Date</th>
+        <th>Action</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr v-for="post in filteredPosts" :key="post.id">
+        <td>{{ post.name }}</td>
+        <td>{{ post.service }}</td>
+        <td>{{ post.content }}</td>
+        <td>{{ post.price }}</td>
+        <td>{{ post.username }}</td>
+        <td>{{ post.total_jobs }}</td>
+        <td>{{ post.average_stars }}</td>
+        <td>{{ post.pincode }}</td> <!-- Display the pincode -->
+        <td>{{ post.address }}</td> <!-- Display the address -->
+        <td>
+          <input type="date" v-model="post.bookingDate" :min="minDate" />
+        </td>
+        <td>
+          <button @click="bookService(post)">Book</button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+    </div>
+  </div>
     `,
     data() {
       return {
         posts: [],  // Array to store posts data
+        searchOption: 'pincode', // Default search option
+      searchQuery: '', // The query to search
+      originalPosts: [],    
       };
     },
     created() {
@@ -105,7 +143,62 @@ export default {
         } catch (error) {
           console.error("Error booking service:", error);
         }
-      }
+      },
+      filterPosts() {
+        if (!this.searchQuery) {
+          this.filteredPosts = this.posts; // If no search query, show all posts
+          return;
+        }
+  
+        this.filteredPosts = this.posts.filter(post => {
+          const query = this.searchQuery.toLowerCase();
+  
+          if (this.searchOption === 'pincode' && post.pincode) {
+            return post.pincode.toString().includes(query); // Filter by pincode
+          }
+          if (this.searchOption === 'service' && post.service) {
+            return post.service.toLowerCase().includes(query); // Filter by service
+          }
+          if (this.searchOption === 'user' && post.username) {
+            return post.username.toLowerCase().includes(query); // Filter by user
+          }
+  
+          return false;
+        });
+      },
+  
+      // Method to book the service
+      async bookService(post) {
+        if (!post.bookingDate) {
+          alert("Please select a booking date.");
+          return;
+        }
+  
+        try {
+          const response = await fetch(`${location.origin}/api/book_service`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "auth-token": this.$store.state.auth_token, // Assuming you're using token-based authentication
+            },
+            body: JSON.stringify({
+              post_id: post.id,
+              booking_date: post.bookingDate,
+            }),
+          });
+  
+          if (response.ok) {
+            alert("Booking successful!");
+            post.bookingDate = ''; // Optionally clear the date field after successful booking
+          } else {
+            const errorData = await response.json();
+            alert(errorData.message || "Booking failed. Please try again.");
+          }
+        } catch (error) {
+          console.error("Error booking service:", error);
+        }
+      },
+      
     },
     computed: {
       minDate() {
@@ -114,6 +207,22 @@ export default {
         const month = String(today.getMonth() + 1).padStart(2, '0');  // Ensure two-digit month
         const day = String(today.getDate()).padStart(2, '0');  // Ensure two-digit day
         return `${year}-${month}-${day}`;  // Return in the format YYYY-MM-DD
+      },
+      filteredPosts() {
+        // Return filtered posts based on the selected search option and query
+        return this.posts.filter(post => {
+          const query = this.searchQuery.toLowerCase();
+          if (this.searchOption === 'pincode' && post.pincode) {
+            return post.pincode.toString().includes(query);
+          }
+          if (this.searchOption === 'service' && post.service) {
+            return post.service.toLowerCase().includes(query);
+          }
+          if (this.searchOption === 'user' && post.username) {
+            return post.username.toLowerCase().includes(query);
+          }
+          return true;
+        });
       },
     }
   };
