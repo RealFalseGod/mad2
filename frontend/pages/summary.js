@@ -10,6 +10,19 @@ export default {
                 <option value="user">User</option>
             </select>
         </div>
+
+        <!-- Search Bar for filtering users by username -->
+        <div class="mb-3">
+            <label for="search" class="form-label">Search by Username</label>
+            <input 
+                v-model="searchQuery" 
+                class="form-control" 
+                id="search" 
+                type="text" 
+                placeholder="Search for a username" 
+                @input="filterUsers"
+            />
+        </div>
         
         <!-- Table of users -->
         <table class="table table-striped">
@@ -25,16 +38,13 @@ export default {
                 </tr>
             </thead>
             <tbody>
-
-                <tr v-for="user in filteredUsers" :key="user.id" >
-                    
-                    <td >{{ user.id }}</td>
-                    <td  @click="$router.push('/info/' + user.id)">{{ user.username }}</td>
+                <tr v-for="user in filteredUsers" :key="user.id">
+                    <td>{{ user.id }}</td>
+                    <td @click="$router.push('/info/' + user.id)">{{ user.username }}</td>
                     <td>{{ user.email }}</td>
                     <td>{{ user.address }}</td>
                     <td>{{ user.pincode }}</td>
                     <td>{{ user.roles[0] }}</td>
-                    
                     <td>
                         <button 
                             class="btn" 
@@ -55,6 +65,7 @@ export default {
             users: [], // All users fetched from the API
             filteredUsers: [], // Users filtered based on selected type
             selectedUserType: 'all', // Default to showing all users
+            searchQuery: '',
         };
     },
 
@@ -82,11 +93,15 @@ export default {
 
         filterUsers() {
             // Filter the users based on selected type
-            if (this.selectedUserType === 'all') {
-                this.filteredUsers = this.users;
-            } else {
-                this.filteredUsers = this.users.filter(user => user.roles.includes(this.selectedUserType));
+            let filtered = this.users;
+            if (this.selectedUserType !== 'all') {
+                filtered = filtered.filter(user => user.roles.includes(this.selectedUserType));
             }
+
+            if (this.searchQuery) {
+                filtered = filtered.filter(user => user.username.toLowerCase().includes(this.searchQuery.toLowerCase()));
+            }
+            this.filteredUsers = filtered;
         }
     },
 

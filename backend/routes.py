@@ -63,6 +63,8 @@ def login():
     user = datastore.find_user(email=email)
     if not user:
         return jsonify({"error": "User not found"}), 404
+    if user.active==0:
+        return jsonify({"error": "You are banned"}), 400
 
     if verify_password(password, user.password):
         return (

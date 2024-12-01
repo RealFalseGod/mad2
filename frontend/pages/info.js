@@ -1,133 +1,185 @@
 export default {
-    template: `
-      <div>
-        <h1>User Info</h1>
-        <p><strong>User ID:</strong> {{ userId }}</p> <!-- Display the user ID -->
-        
-        <!-- Display loading state or user data -->
-        <div v-if="isLoading">Loading...</div>
-        <div v-else-if="userData">
-          <p><strong>Name:</strong> {{ userData.name }}</p>
-          <p><strong>Email:</strong> {{ userData.email }}</p>
-          <!-- Add other user data fields as needed -->
-        </div>
-        <div v-else>
-          <p>Error fetching user data.</p>
-        </div>
-  
-        <!-- Example of services display -->
-        <h2>Booked Services</h2>
-        <ul>
-  <li v-for="service in bookedServices" :key="service.id">
-    <strong>Service:</strong> {{ service.service }} 
-    <br>
-    <strong>Post Name:</strong> {{ service.post_name }}
-    <br>
-    <strong>Booking Date:</strong> {{ new Date(service.booking_date).toLocaleDateString() }} <!-- Optional: Format the date -->
-  </li>
-</ul>
-        <h2>Provided Services</h2>
-        <ul>
-          <li v-for="service in providedServices" :key="service.id">{{ service.name }}</li>
-        </ul>
-      </div>
-    `,
-    data() {
-      return {
-        userId: null, // Store the user ID from route params
-        userData: null, // Store the fetched user data
-        isLoading: true, // Loading state for the fetch request
-        providedServices: [],
-        bookedServices: [],
-        userRole: null, // Store user role (user or staff)
-      };
-    },
-    mounted() {
-      // Access the user ID from the route params
-      this.userId = this.$route.params.id;
-  
-      // Log the user ID to check if it's correctly passed
-      console.log("User ID received:", this.userId);
-  
-      // Fetch data on mount
-      this.fetchUserData();
-    },
-    methods: {
-      async fetchUserData() {
-        try {
-          const response = await fetch(`${location.origin}/api/user/${this.userId}`, {
-            headers: {
-              'Content-Type': 'application/json',
-              'auth-token': this.$store.state.auth_token, // Use the token from Vuex store
-            },
-          });
-  
-          if (response.ok) {
-            this.userData = await response.json();
-            console.log("User Data:", this.userData);
-  
-            // Determine user role based on roles array
-            this.userRole = this.userData.roles.includes("staff") ? "staff" : "user";
-            
-            // Fetch services based on the role
-            if (this.userRole === "user") {
-              await this.fetchBookedServices();
-            } else if (this.userRole === "staff") {
-              await this.fetchProvidedServices();
-            }
-          } else {
-            console.error(`Error: ${response.status} - ${response.statusText}`);
-          }
-        } catch (error) {
-          console.error("Error fetching user data:", error);
-        } finally {
-          this.isLoading = false;
-        }
-      },
-  
-      async fetchBookedServices() {
-        try {
-          const response = await fetch(`${location.origin}/api/user/${this.userId}/bookings`, {
-            method: 'GET',
-            headers: {
-              'Content-Type': 'application/json',
-              'auth-token': this.$store.state.auth_token, // Include the auth token for authentication
-            },
-            
-          });
-          console.log(`Fetching bookings from: ${location.origin}/api/user/${this.userId}/bookings`);
+  template: `
+  <div>
+  <div v-if="isLoading">
+    <p>Loading...</p>
+  </div>
 
-          if (response.ok) {
-            this.bookedServices = await response.json();
-          } else {
-            const errorData = await response.json();
-            console.error("Failed to fetch booked services:", errorData.message);
+  <div v-else>
+    <div v-if="userRole === 'user'">
+      <h2>User Bookings</h2>
+      <div v-if="bookings.length === 0">
+        <p>No bookings found.</p>
+      </div>
+      <div v-else>
+        <table border="1">
+          <thead>
+            <tr>
+              <th>Booking ID</th>
+              <th>Post ID</th>
+              <th>Booking Date</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="booking in bookings" :key="booking.id">
+              <td>{{ booking.id }}</td>
+              <td>{{ booking.post_id }}</td>
+              <td>{{ booking.booking_date }}</td>
+              <td>{{ booking.status }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h2>Your Reviews</h2>
+      <div v-if="reviews.length === 0">
+        <p>No reviews found.</p>
+      </div>
+      <div v-else>
+        <table border="1">
+          <thead>
+            <tr>
+              <th>Review ID</th>
+              <th>Post ID</th>
+              <th>Star Rating</th>
+              <th>Review Content</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="review in reviews" :key="review.id">
+              <td>{{ review.id }}</td>
+              <td>{{ review.p_id }}</td>
+              <td>{{ review.star }}</td>
+              <td>{{ review.content }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div v-else-if="userRole === 'staff'">
+      <h2>Staff Overview</h2>
+      <table border="1">
+        <tbody>
+          <tr>
+            <th>Jobs Done</th>
+            <td>{{ jobsDone }}</td>
+          </tr>
+          <tr>
+            <th>Star Rating</th>
+            <td>{{ stars }}</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h2>Staff's Bookings</h2>
+      <div v-if="bookings.length === 0">
+        <p>No bookings found for this staff.</p>
+      </div>
+      <div v-else>
+        <table border="1">
+          <thead>
+            <tr>
+              <th>Booking ID</th>
+              <th>Post ID</th>
+              <th>Booking Date</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="booking in bookings" :key="booking.id">
+              <td>{{ booking.id }}</td>
+              <td>{{ booking.post_id }}</td>
+              <td>{{ booking.booking_date }}</td>
+              <td>{{ booking.status }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h2>Reviews for this Staff</h2>
+      <div v-if="reviews.length === 0">
+        <p>No reviews found for this staff.</p>
+      </div>
+      <div v-else>
+        <table border="1">
+          <thead>
+            <tr>
+              <th>Review ID</th>
+              <th>User ID</th>
+              <th>Star Rating</th>
+              <th>Review Content</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="review in reviews" :key="review.id">
+              <td>{{ review.id }}</td>
+              <td>{{ review.user_id }}</td>
+              <td>{{ review.star }}</td>
+              <td>{{ review.content }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+  `,
+  data() {
+    return {
+      userId: null, // Store the user ID from route params
+      userRole: null, // Role of the user (user or staff)
+      bookings: [], // Bookings data
+      reviews: [], // Reviews data
+      posts: [], // Posts data (if staff)
+      jobsDone: 0, // Jobs done by staff
+      stars: 0, // Star rating for the staff
+      isLoading: true, // Loading state for the fetch request
+    };
+  },
+  mounted() {
+    // Access the user ID from the route params
+    this.userId = this.$route.params.id;
+    console.log("User ID received:", this.userId);
+
+    // Fetch data on mount
+    this.fetchUserData();
+  },
+  methods: {
+    async fetchUserData() {
+      try {
+        const response = await fetch(`${location.origin}/api/admin_book/${this.userId}`, {
+          headers: {
+            "Content-Type": "application/json",
+            "auth-token": this.$store.state.auth_token, // Use the token from Vuex store
+          },
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          console.log("API Response:", data);
+
+          // Update the component state
+          this.userRole = data.user_role;
+          this.bookings = data.bookings;
+          this.reviews = data.reviews;
+          this.posts = data.posts;
+
+          // If the user is a staff, get the jobs done and stars
+          if (this.userRole === "staff") {
+            this.jobsDone = data.jobs_done || 0;
+            this.stars = data.stars || 0;
           }
-        } catch (error) {
-          console.error("Error fetching booked services:", error);
+        } else {
+          console.error(`Error: ${response.status} - ${response.statusText}`);
         }
-      },
-  
-      async fetchProvidedServices() {
-        try {
-          const response = await fetch(`${location.origin}/api/user/${this.userId}/provided-services`, {
-            method: 'GET',
-            headers: {
-              'Content-Type': 'application/json',
-              'auth-token': this.$store.state.auth_token, // Include the auth token for authentication
-            },
-          });
-  
-          if (response.ok) {
-            this.providedServices = await response.json();
-          } else {
-            const errorData = await response.json();
-            console.error("Failed to fetch provided services:", errorData.message);
-          }
-        } catch (error) {
-          console.error("Error fetching provided services:", error);
-        }
-      },
+      } catch (error) {
+        console.error("Error fetching user data:", error);
+      } finally {
+        this.isLoading = false;
+      }
     },
-  };
-  
+  },
+};

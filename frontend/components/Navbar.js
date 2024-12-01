@@ -5,7 +5,8 @@ export default {
     <router-link class="nav-link" v-if="!$store.state.loggedin" to="/login">Login</router-link>
     <router-link class="nav-link" v-if="!$store.state.loggedin" to="/register">Register</router-link>
     <router-link class="nav-link" v-if="$store.state.loggedin && $store.state.role == 'admin'" to="/admin-dashboard">Admin Page</router-link>
-    <router-link class="nav-link" v-if="$store.state.loggedin" to="/services">Services</router-link>
+    <router-link class="nav-link" v-if="$store.state.loggedin && $store.state.role == 'user'" to="/services">Services</router-link>
+    <router-link class="nav-link" v-if="$store.state.loggedin && $store.state.role == 'staff'" to="/posts">My Posts</router-link>
     <router-link class="nav-link" v-if="$store.state.loggedin && $store.state.role == 'staff'" to="/create-post">Create Post</router-link>
     <router-link class="nav-link" v-if="$store.state.loggedin && $store.state.role == 'staff'" to="/view_request">View Requests</router-link>
     <router-link class="nav-link" v-if="$store.state.loggedin && $store.state.role == 'user'" to="/my_bookings">My bookings</router-link>

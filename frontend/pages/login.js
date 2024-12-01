@@ -31,7 +31,7 @@ export default {
                 localStorage.setItem('user', JSON.stringify(data))
                 
                 this.$store.commit('setUser')
-                this.$router.push('/services')
+                this.$router.push('/')
             }else{
                 const err = await res.json()
                 alert(err.error || "Login failed");

@@ -1,77 +1,57 @@
 export default {
-
-    props: ["id"],
-
     template: `
-    <div class="post-view">
-        <h1>Post View Page</h1>
-        <br />
-        <h2>{{ post.name }}</h2>
-        <p>{{ post.content }}</p>
-        <p>Price: ₹{{ post.price }}</p>
+    <div class="post-list-container dark-theme">
+        <h1>Your Posts</h1>
 
-        <div v-if="$store.state.role === 'user'">
-            <input 
-                type="date" 
-                v-model="booking_date" 
-                class="form-control mb-3" 
-                :min="minDate"
-                placeholder="Select a date"
-            />
-            <button class="btn btn-primary" @click="bookservice">Book Service</button>
+        <div v-if="isLoading">
+            <p>Loading...</p>
+        </div>
+
+        <div v-else>
+            <div v-if="posts.length === 0">
+                <p>No posts available.</p>
+            </div>
+
+            <div v-else>
+                <div v-for="post in posts" :key="post.id" class="post-item">
+                    <h3>{{ post.name }}</h3>
+                    <p><strong>Service:</strong> {{ post.service }}</p>
+                    <p><strong>Description:</strong> {{ post.content }}</p>
+                    <p><strong>Price:</strong> {{ post.price }}</p>
+                </div>
+            </div>
         </div>
     </div>
-    
     `,
     data() {
         return {
-            post: {},
-            booking_date: "",
+            posts: [],         // Stores fetched posts
+            isLoading: true,   // Tracks loading state
         };
     },
-
-    async mounted() {
-        
-        const res = await fetch(`${location.origin}/api/posts/${this.id}`, {
-            headers: {
-                "auth-token": this.$store.state.auth_token,
-            },
-        })
-        if (res.ok) {
-            this.post = await res.json()
-        }
+    mounted() {
+        this.fetchPosts();  // Fetch posts when the component is mounted
     },
-
     methods: {
-        async bookservice() {
-            const res = await fetch(`${location.origin}/api/book_service`, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    "auth-token": this.$store.state.auth_token,
-                },
-                body: JSON.stringify({
-                    post_id: this.id,
-                    booking_date: this.booking_date,
-                }),
-            });
-            if (res.ok) {
-                alert("Service booked successfully");
-            } else {
-                const errorData = await res.json();
-                alert(`${errorData.message || "Unknown error"}`);
+        async fetchPosts() {
+            try {
+                const response = await fetch(`${location.origin}/api/get_postlist`, {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'auth-token': this.$store.state.auth_token // Assuming the token is stored in Vuex
+                    }
+                });
+
+                if (response.ok) {
+                    this.posts = await response.json();  // Assign fetched posts to the posts array
+                } else {
+                    console.error(`Error fetching posts: ${response.statusText}`);
+                }
+            } catch (error) {
+                console.error("Error fetching posts:", error);
+            } finally {
+                this.isLoading = false;  // Set loading to false when data is fetched
             }
-        },
-            
-    },
-    computed: {
-        minDate() {
-          const today = new Date();
-          const year = today.getFullYear();
-          const month = String(today.getMonth() + 1).padStart(2, '0');  // Ensure two-digit month
-          const day = String(today.getDate()).padStart(2, '0');  // Ensure two-digit day
-          return `${year}-${month}-${day}`;  // Return in the format YYYY-MM-DD
-        },
-      }
-    
-}
+        }
+    }
+};

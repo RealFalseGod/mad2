@@ -22,7 +22,7 @@ const routes = [
     { path: "/login", component: login },
     { path: "/register", component: register },
     { path: "/services", component: services_list, meta: { requiresAuth: true} },
-    { path: "/posts/:id", component: post_display, props: true, meta: { requiresAuth: true } },
+    { path: "/posts", component: post_display, meta: { requiresAuth: true,role : 'staff' } },
     { path: "/admin-dashboard", component: admin_page, meta: { requiresAuth: true, role : 'admin' } },
     { path: "/create-post", component: create_post, meta: { requiresAuth: true, role : 'staff' } },
     { path: "/edit-post/:id", component: edit_post, props: true, meta: { requiresAuth: true, role : 'staff' } },

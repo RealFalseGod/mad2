@@ -1,6 +1,6 @@
 from flask_restful import Api, Resource, fields, marshal_with
 from flask import request, current_app as app
-from backend.model import post, servicebooking, review, review_of_p
+from backend.model import post, servicebooking, review, review_of_p,UserRoles
 from flask_security import auth_required, current_user
 from backend.model import db, User
 from datetime import datetime
@@ -44,6 +44,17 @@ user_fields = {
     "active": fields.Boolean,
 }
 
+get_fields = {
+    "id": fields.Integer,
+    "username": fields.String,
+    "email": fields.String,
+    "address": fields.String,
+    "pincode": fields.String,
+    "roles": fields.List(fields.String(attribute="name")),
+    "active": fields.Boolean,
+    "role":fields.String,
+}
+
 booking_fields = {
     "id": fields.Integer,
     "user_id": fields.Integer,
@@ -79,6 +90,39 @@ get_booking_fields_for_user = {
     ),
 }
 
+user_booking_fields = {
+    "id": fields.Integer,
+    "user_id": fields.Integer,
+    "post_id": fields.Integer,
+    "booking_date": fields.DateTime,
+    "status": fields.String,
+}
+
+review_fields = {
+    "id": fields.Integer,
+    "user_id": fields.Integer,
+    "p_id": fields.Integer,  # Assuming `p_id` is the post ID or relevant identifier
+    "star": fields.Float,
+    "content": fields.String,
+}
+
+post_fields3 = {
+    "id": fields.Integer,
+    "user_id": fields.Integer,
+    "name": fields.String,
+    "content": fields.String,
+    "service":fields.String,
+    "price": fields.Float,
+}
+
+response_fields = {
+    "user_role": fields.String,
+    "jobs_done":fields.Integer,
+    "stars":fields.Float,
+    "bookings": fields.List(fields.Nested(user_booking_fields)),
+    "reviews": fields.List(fields.Nested(review_fields)),
+    "posts": fields.List(fields.Nested(post_fields3)),
+}
 
 class user_list(Resource):
     @auth_required("token")
@@ -128,13 +172,14 @@ class user_list(Resource):
 
 class get_user(Resource):
     @auth_required("token")
-    @marshal_with(user_fields)
+    @marshal_with(get_fields)
     def get(self, user_id):
         if not current_user.has_role("admin"):
             return {"message": "You are not authorized to view this resource"}, 403
         else:
             users = User.query.get(user_id)
-            # print(users)
+            role = UserRoles.query.filter_by(user_id=user_id).first().role_id
+            print(users,role)
             return users
 
 
@@ -202,7 +247,7 @@ class post_api(Resource):
 class postlist_api(Resource):
 
     @auth_required("token")
-    @cache.cached(timeout=10, key_prefix="post_list")
+    @cache.cached(timeout=10, key_prefix="postlist_api")
     @marshal_with(post_fields)
     def get(self):
         posts = post.query.all()
@@ -222,7 +267,9 @@ class postlist_api(Resource):
     @auth_required("token")
     def post(self):  # Create a new post
         data = request.get_json()
-
+        c = post.query.filter_by(user_id=current_user.id).count()
+        if c>=2:
+            return {"message": "Cant create more than 2 posts"}, 500
         new_post = post(
             name=data.get("name"),
             service=data.get("service"),
@@ -311,8 +358,8 @@ class bookings(Resource):
         if post_count >= 5:
             return {"message": "Cant book more than 5 services"}, 500
         existing_booking = servicebooking.query.filter_by(
-            user_id=user_id, post_id=post_id, booking_date=booking_date
-        ).first()
+            user_id=user_id, post_id=post_id, booking_date=booking_date,status=''
+        ).filter(servicebooking.status != 'rejected').first()
 
         if existing_booking:
             return {"message": "You have already booked this service on this day"}, 400
@@ -586,6 +633,60 @@ class done_and_review(Resource):
             db.session.rollback()
             return {"message": f"Error review failed: {str(e)}"}, 500
 
+class admin_bookings_for_user(Resource):
+    @auth_required("token")
+    @marshal_with(response_fields)
+    def get(self, user_id):
+        if not current_user.has_role("admin"):
+            return {"message": "You are not authorized to view this resource"}, 403
+
+        # Fetch the user's role
+        role = UserRoles.query.filter_by(user_id=user_id).first().role_id
+
+        if role == 2:  # Normal User
+            bookings = servicebooking.query.filter_by(user_id=user_id).all()
+            reviews = review.query.filter_by(user_id=user_id).all()
+            return {
+                "user_role": "user",
+                "bookings": bookings,
+                "reviews": reviews,
+                "posts": [],  # No posts for normal users
+            }
+
+        elif role == 3:  # Staff
+            posts = post.query.filter_by(user_id=user_id).all()
+            reviews = review.query.filter_by(p_id=user_id).all()
+            p_review = review_of_p.query.filter_by(p_id=user_id).first()
+            if p_review:
+                jobs_done = p_review.no_of_job
+                stars = p_review.star
+            else:
+                jobs_done = 0  # Default value when there's no review
+                stars = 0  # Default value or null when there's no review
+            bookings = []
+            for p in posts:
+                bookings.extend(servicebooking.query.filter_by(post_id=p.id).all())
+            return {
+                "user_role": "staff",
+                "bookings": bookings,
+                "reviews": reviews,
+                "posts": posts,
+                "jobs_done":jobs_done,
+                "stars":stars,
+            }
+
+        return {"message": "Invalid user role"}, 400
+
+class get_postlist(Resource):
+
+    @auth_required("token")
+    @cache.cached(timeout=10, key_prefix="get_postlist")
+    @marshal_with(post_fields)
+    def get(self):
+        posts = post.query.filter_by(user_id=current_user.id).all()
+        return posts
+    
+    
 
 
 api.add_resource(user_list, "/users", endpoint="users_list")
@@ -603,3 +704,5 @@ api.add_resource(cancel_booking, "/bookings/cancel/<int:booking_id>")
 api.add_resource(bookings_for_user, "/books")
 api.add_resource(done_and_review, "/review/<int:booking_id>")
 api.add_resource(postlist2, "/post_list")
+api.add_resource(admin_bookings_for_user, "/admin_book/<int:user_id>")
+api.add_resource(get_postlist, "/get_postlist")
