@@ -1,6 +1,4 @@
-
 export default {
-
     template: `
     <div class="create-post-container dark-theme">
             <h1>Create Post</h1>
@@ -49,7 +47,7 @@ export default {
             name: '',
             content: '',
             service: '',
-            price: 0,
+            price: 0
         }
     },
     methods: {
@@ -57,21 +55,21 @@ export default {
             const res = await fetch(location.origin + '/api/posts', {
                 headers: {
                     'Content-Type': 'application/json',
-                    'auth-token': this.$store.state.auth_token,
+                    'auth-token': this.$store.state.auth_token
                 },
                 method: 'POST',
                 body: JSON.stringify({
                     name: this.name,
                     content: this.content,
                     service: this.service,
-                    price: this.price,
-                }),
-            });
+                    price: this.price
+                })
+            })
             if (res.ok) {
-                alert("Post created successfully!");
-                this.$router.push('/services');
+                alert('Post created successfully!')
+                this.$router.push('/services')
             } else {
-                alert("Post creation failed!");
+                alert('Post creation failed!')
             }
         }
     }

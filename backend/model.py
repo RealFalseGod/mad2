@@ -1,5 +1,6 @@
 from flask_sqlalchemy import SQLAlchemy
 from flask_security import UserMixin, RoleMixin
+from sqlalchemy import Numeric
 
 db = SQLAlchemy()
 
@@ -40,17 +41,22 @@ class UserRoles(db.Model):
     def __repr__(self):
         return f"<UserRoles(user_id={self.user_id}, role_id={self.role_id})>"
 
+
 class post(db.Model):
     __tablename__ = "posts"
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(80), nullable=False)
     service = db.Column(db.String(80), nullable=False)
     content = db.Column(db.String(), nullable=False)
-    price = db.Column(db.Integer, nullable=False) 
+    price = db.Column(db.Integer, nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
     user = db.relationship("User", backref="posts")
+
     def __repr__(self):
-        return f"<post(id={self.id}, service='{self.service}', content='{self.content}')>"
+        return (
+            f"<post(id={self.id}, service='{self.service}', content='{self.content}')>"
+        )
+
 
 class servicebooking(db.Model):
     __tablename__ = "servicebooking"
@@ -63,14 +69,24 @@ class servicebooking(db.Model):
     post = db.relationship("post", backref="service_booking")
     # def __repr__(self):
     #     return f"<servicebooking(id={self.id}, service='{self.service}', content='{self.content}')>"
+
+
 class review(db.Model):
     __tablename__ = "review"
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
     post_id = db.Column(db.Integer, db.ForeignKey("posts.id"), nullable=False)
     star = db.Column(db.Integer)
-    content=db.Column(db.String(100))
-    p_id = db.Column(db.Integer,nullable=False)
+    content = db.Column(db.String(100))
+    p_id = db.Column(db.Integer, nullable=False)
     user = db.relationship("User", backref="review")
     post = db.relationship("post", backref="review")
-    
+
+
+class review_of_p(db.Model):
+    __tablename__ = "review_of_p"
+    id = db.Column(db.Integer, primary_key=True)
+    star = db.Column(Numeric(10, 2))
+    no_of_job = db.Column(db.Integer, default=0)
+    p_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
+    user = db.relationship("User", backref="review_of_p")
