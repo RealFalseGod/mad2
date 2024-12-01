@@ -58,7 +58,7 @@ class servicebooking(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
     post_id = db.Column(db.Integer, db.ForeignKey("posts.id"), nullable=False)
     booking_date = db.Column(db.DateTime, nullable=False)
-
+    status = db.Column(db.String(80), default="pending")
     user = db.relationship("User", backref="service_booking")
     post = db.relationship("post", backref="service_booking")
     def __repr__(self):

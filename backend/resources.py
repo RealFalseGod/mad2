@@ -6,7 +6,7 @@ from backend.model import db, User
 from datetime import datetime
 from dateutil.parser import parse as parse_date
 from backend.celery.tasks import email
-
+from backend.celery.mail_service import send_email
 cache = app.cache
 
 api = Api(prefix="/api")
@@ -38,7 +38,16 @@ booking_fields = {
     "username": fields.String(attribute="user.username"),
     "service": fields.String(attribute="post.service"),
     "post_name": fields.String(attribute="post.name"),
-    "name":field.String(a)
+    "name":fields.String
+}
+get_booking_fields = {
+    "name":fields.String,
+    'booking_id': fields.Integer,
+    'booking_date': fields.DateTime,
+    'service':fields.String,  # Service name
+    'name': fields.String,        # Service name
+    'user_name': fields.String,
+    'status': fields.String
 }
 
 class user_list(Resource):
@@ -200,7 +209,7 @@ class bookings(Resource):
             return {"message": "Missing required fields"},
         post_count = servicebooking.query.filter_by(user_id=user_id).count() 
         print(post_count,1111)
-        if post_count<=5:
+        if post_count>=5:
              return {"message": "Cant book more than 5 services"}, 500
         existing_booking = servicebooking.query.filter_by(
             user_id=user_id, post_id=post_id, booking_date=booking_date
@@ -258,7 +267,7 @@ class services_by_staff(Resource):
         return posts, 200    
 class bookings_by_user(Resource):
     @auth_required("token")
-    @marshal_with(booking_fields)
+    @marshal_with(get_booking_fields)
     def get(self, user_id):
         print(1)
         # Ensure only admin or the user can access this data
@@ -296,15 +305,74 @@ class bookings_by_user(Resource):
                 'booking_date': booking_date,
                 'service': service,  # Service name
                 'name': name,        # Service name
-                'user_name': user_name,  # User who made the booking
+                'user_name': user_name,
+                'status': booking.status
             }
             result.append(booking_info)
-            print(booking_info)
-        print(result) 
+            
+        
         return result, 200
 
-
+class reject_booking(Resource):
+    @auth_required("token")
+    def put(self, booking_id):
+        print("comming")
+        if not current_user.has_role("admin") and not current_user.has_role("staff"):
+            return {"message": "You are not authorized to perform this action"}, 403
         
+        booking = servicebooking.query.get(booking_id)
+        ser_user = User.query.get(booking.user_id)
+        if not booking:
+            return {"message": "Booking not found"}, 404
+
+        try:
+            booking.status = "rejected"  # Update status to "rejected"
+            db.session.commit()
+            subject = "Your Booking Has Been Rejected"
+            content = f"""
+                <p>Dear {ser_user.username},</p>
+                <p>We regret to inform you that your booking (Booking ID: {booking.id}) for the services has been rejected.</p>
+                <p>If you have any questions or concerns, please contact us.</p>
+                <p>Best regards,<br>Your Service Team</p>
+            """
+            send_email(ser_user.email, subject, content)
+            return {"message": "Booking rejected successfully"}, 200
+        except Exception as e:
+            db.session.rollback()
+            return {"message": f"Error rejecting booking: {str(e)}"}, 500
+
+
+class accept_booking(Resource):
+    @auth_required("token")
+    def put(self, booking_id):
+        print("comming")
+        if not current_user.has_role("admin") and not current_user.has_role("staff"):
+            return {"message": "You are not authorized to perform this action"}, 403
+        
+        booking = servicebooking.query.get(booking_id)
+        ser_user = User.query.get(booking.user_id)
+        if not booking:
+            return {"message": "Booking not found"}, 404
+
+        try:
+            booking.status = "accepted"  # Update status to "accepted"
+            db.session.commit()
+
+            subject = "Your Booking Has Been Accepted"
+            content = f"""
+                <p>Dear {ser_user.username},</p>
+                <p>We are pleased to inform you that your booking (Booking ID: {booking.id}) for the services has been accepted.</p>
+                <p>If you have any further questions or need assistance, feel free to contact us.</p>
+                <p>Best regards,<br>Your Service Team</p>
+            """
+            send_email(ser_user.email, subject, content)
+
+            return {"message": "Booking accepted successfully"}, 200
+        except Exception as e:
+            db.session.rollback()
+            return {"message": f"Error accepting booking: {str(e)}"}, 500
+
+
         
 api.add_resource(user_list, "/users", endpoint="users_list")
 api.add_resource(get_user, "/user/<int:user_id>")
@@ -314,5 +382,8 @@ api.add_resource(bookings, "/book_service")
 api.add_resource(booking_list, "/bookings")
 api.add_resource(services_by_staff, "/staff/<int:staff_id>/services")
 api.add_resource(bookings_by_user, "/bookings/<int:user_id>")
+
+api.add_resource(reject_booking, "/bookings/reject/<int:booking_id>")
+api.add_resource(accept_booking, "/bookings/accept/<int:booking_id>")
 
 
