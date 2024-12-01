@@ -63,3 +63,14 @@ class servicebooking(db.Model):
     post = db.relationship("post", backref="service_booking")
     # def __repr__(self):
     #     return f"<servicebooking(id={self.id}, service='{self.service}', content='{self.content}')>"
+class review(db.Model):
+    __tablename__ = "review"
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
+    post_id = db.Column(db.Integer, db.ForeignKey("posts.id"), nullable=False)
+    star = db.Column(db.Integer)
+    content=db.Column(db.String(100))
+    p_id = db.Column(db.Integer,nullable=False)
+    user = db.relationship("User", backref="review")
+    post = db.relationship("post", backref="review")
+    

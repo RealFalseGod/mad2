@@ -1,6 +1,6 @@
 from flask_restful import Api, Resource, fields, marshal_with
 from flask import request, current_app as app
-from backend.model import post, servicebooking
+from backend.model import post, servicebooking,review
 from flask_security import auth_required, current_user
 from backend.model import db, User
 from datetime import datetime
@@ -221,7 +221,7 @@ class bookings(Resource):
 
         if not post_id or not booking_date:
             return {"message": "Missing required fields"},
-        post_count = servicebooking.query.filter_by(user_id=user_id).count() 
+        post_count = servicebooking.query.filter_by(user_id=user_id, status='pending').count() 
         print(post_count,1111)
         if post_count>=5:
              return {"message": "Cant book more than 5 services"}, 500
@@ -384,6 +384,7 @@ class reject_booking(Resource):
             return {"message": f"Error rejecting booking: {str(e)}"}, 500
 
 
+
 class accept_booking(Resource):
     @auth_required("token")
     def put(self, booking_id):
@@ -414,7 +415,30 @@ class accept_booking(Resource):
             db.session.rollback()
             return {"message": f"Error accepting booking: {str(e)}"}, 500
 
-
+class done_and_review(Resource):
+    @auth_required("token")
+    def post(self, booking_id):       
+        booking = servicebooking.query.get(booking_id)
+        p_id=post.query.get(booking.post_id).user_id
+        data = request.get_json()
+        review_text = data.get("review")
+        star_rating = data.get("stars")
+        print(data,122)
+        try:
+            booking.status = "done" 
+            new_review =review(
+                user_id=booking.user_id,
+                post_id=booking.post_id,
+                star=star_rating,
+                content=review_text,
+                p_id=p_id
+            )
+            db.session.add(new_review)
+            db.session.commit()
+            return {"message": "review done successfully"}, 200
+        except Exception as e:
+            db.session.rollback()
+            return {"message": f"Error review failed: {str(e)}"}, 500
         
 api.add_resource(user_list, "/users", endpoint="users_list")
 api.add_resource(get_user, "/user/<int:user_id>")
@@ -428,4 +452,4 @@ api.add_resource(bookings_by_user, "/bookings/<int:user_id>")
 api.add_resource(reject_booking, "/bookings/reject/<int:booking_id>")
 api.add_resource(accept_booking, "/bookings/accept/<int:booking_id>")
 api.add_resource(bookings_for_user, "/books")
-
+api.add_resource(done_and_review, "/review/<int:booking_id>")
