@@ -49,6 +49,19 @@ get_booking_fields = {
     'user_name': fields.String,
     'status': fields.String
 }
+get_booking_fields_for_user = {
+    'id': fields.Integer,
+    'user_id': fields.Integer,
+    'post_id': fields.Integer,
+    'booking_date': fields.DateTime,
+    'status': fields.String,
+    'post_details': fields.Nested({
+        'name': fields.String,  # The post name
+        'service': fields.String,  # The service offered in the post
+        'price': fields.Integer,  # The price of the service
+        'username': fields.String,  # Username of the person who created the post
+    })
+}
 
 class user_list(Resource):
     @auth_required("token")
@@ -93,6 +106,7 @@ class user_list(Resource):
         except:
             db.session.rollback()
             return {"message": "Error updating user status"}, 500
+
 class get_user(Resource):
     @auth_required("token")
     @marshal_with(user_fields)
@@ -272,11 +286,10 @@ class bookings_by_user(Resource):
         print(1)
         # Ensure only admin or the user can access this data
         if current_user.has_role("admin"):
-            print(1)
+            
             # If the user is admin or accessing their own bookings, get the bookings
             bookings = servicebooking.query.filter_by(user_id=user_id).all()
         elif current_user.has_role("staff"):
-            print(1)
             # If the user is staff, fetch bookings for posts created by the staff
             bookings = db.session.query(servicebooking).join(post, post.id == servicebooking.post_id).filter(post.user_id == current_user.id).all()
         else:
@@ -312,6 +325,35 @@ class bookings_by_user(Resource):
             
         
         return result, 200
+
+class bookings_for_user(Resource):
+    @auth_required("token")
+    @marshal_with(get_booking_fields_for_user)
+    def get(self):
+        print(current_user.id)
+        
+        if current_user.has_role("admin"):
+            # Admin should be able to see all bookings (as per the original code)
+            bookings = servicebooking.query.filter_by(user_id=current_user.id).all()
+            return bookings
+        elif current_user.has_role("user"):
+            # For a user, we fetch their bookings and include post details
+            bookings = servicebooking.query.filter_by(user_id=current_user.id).all()
+
+            # Add the additional details (post details + username of the user who created the post)
+            for booking in bookings:
+                post_data = booking.post  # The associated post object
+                # Append the additional post details to the booking
+                booking.post_details = {
+                    'name': post_data.name,
+                    'service': post_data.service,
+                    'price': post_data.price,
+                    'username': post_data.user.username  # Assuming `user` is a relationship on the `post` model
+                }
+            
+            return bookings
+        else:
+            return {"message": "You are not authorized to view this resource"}, 403
 
 class reject_booking(Resource):
     @auth_required("token")
@@ -385,5 +427,5 @@ api.add_resource(bookings_by_user, "/bookings/<int:user_id>")
 
 api.add_resource(reject_booking, "/bookings/reject/<int:booking_id>")
 api.add_resource(accept_booking, "/bookings/accept/<int:booking_id>")
-
+api.add_resource(bookings_for_user, "/books")
 

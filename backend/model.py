@@ -48,7 +48,7 @@ class post(db.Model):
     content = db.Column(db.String(), nullable=False)
     price = db.Column(db.Integer, nullable=False) 
     user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
-
+    user = db.relationship("User", backref="posts")
     def __repr__(self):
         return f"<post(id={self.id}, service='{self.service}', content='{self.content}')>"
 
@@ -61,5 +61,5 @@ class servicebooking(db.Model):
     status = db.Column(db.String(80), default="pending")
     user = db.relationship("User", backref="service_booking")
     post = db.relationship("post", backref="service_booking")
-    def __repr__(self):
-        return f"<servicebooking(id={self.id}, service='{self.service}', content='{self.content}')>"
+    # def __repr__(self):
+    #     return f"<servicebooking(id={self.id}, service='{self.service}', content='{self.content}')>"

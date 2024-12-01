@@ -8,6 +8,7 @@ export default {
     <router-link class="nav-link" v-if="$store.state.loggedin" to="/services">Services</router-link>
     <router-link class="nav-link" v-if="$store.state.loggedin && $store.state.role == 'staff'" to="/create-post">Create Post</router-link>
     <router-link class="nav-link" v-if="$store.state.loggedin && $store.state.role == 'staff'" to="/view_request">View Requests</router-link>
+    <router-link class="nav-link" v-if="$store.state.loggedin && $store.state.role == 'user'" to="/my_bookings">My bookings</router-link>
     <button class="btn-logout" v-if="$store.state.loggedin" @click="logout">Logout</button>
   </div>
     `,
