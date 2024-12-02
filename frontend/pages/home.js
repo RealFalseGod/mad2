@@ -1,6 +1,11 @@
 export default {
     template: `
     <div>
+    <div v-if="!$store.state.loggedin">
+    <div class="containerh">
+  <h1>Service Snap</h1>
+</div>
+    </div>
     <h1 v-if="userRole === 'admin'">Admin Dashboard</h1>
     <h1 v-if="userRole === 'staff'">Staff Dashboard</h1>
     <h1 v-if="userRole === 'user'">User Dashboard</h1>

@@ -1,28 +1,46 @@
-/*body*/
-body {
-  background-color: #1a202c; /* Dark background for the whole page */
-  color: #e2e8f0; /* Light text color for readability */
-  font-family: 'Arial', sans-serif; /* Clean and modern font */
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
+/*home*/
+* {
   margin: 0;
   padding: 0;
+  box-sizing: border-box;
+}
+.containerh {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh; /* Full height of the viewport */
+  text-align: center;
+  font-size: 4rem; /* Big text size */
+  color: #333; /* Dark text color for good contrast */
+  font-weight: bold; /* Bold text */
+}
+
+
+/*body*/
+body {
+  font-family: 'Roboto', sans-serif;
+  background-color: #121212;
+  color: #fff;
 }
 /* navbar */
 /* General styles for the navigation container */
 /* Style for the navigation container */
 .nav-container {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
+  justify-content: center; /* Center items horizontally */
+  align-items: center; /* Center items vertically */
   padding: 10px 30px;
-  background-color: #2d2d2d; /* Dark background for consistency */
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2); /* Slight shadow for depth */
-  border-bottom: 2px solid #4a4a4a; /* Subtle border for structure */
+  background-color: #1f1f1f; /* Dark background for the navbar */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5); /* Enhanced shadow for depth */
+  border-bottom: 2px solid #333; /* Slightly lighter border for structure */
+  width: 100%; /* Ensure navbar spans full width */
 }
 
 /* Style for the navigation links */
 .nav-link {
   text-decoration: none;
-  color: #e2e8f0; /* Light gray text for readability on dark background */
+  color: #e2e8f0; /* Light gray text for readability */
   margin: 0 20px;
   font-weight: 600;
   font-size: 16px;
@@ -52,17 +70,18 @@ body {
 
 /* Style for the logout button */
 .btn-logout {
-  background-color: #38b2ac; /* Teal for the button */
-  color: #f7fafc; /* Very light gray for contrast */
+  background-color: #38b2ac; /* Teal color for the button */
+  color: #f7fafc; /* Light gray for contrast */
   border: none;
   padding: 8px 20px;
   cursor: pointer;
-  border-radius: 20px; /* Rounded button for elegance */
+  border-radius: 20px; /* Rounded corners for elegance */
   font-size: 14px;
   font-weight: 600;
   transition: background-color 0.3s ease, transform 0.2s ease;
 }
 
+/* Hover effect for logout button */
 .btn-logout:hover {
   background-color: #2c7a7b; /* Darker teal for hover effect */
   transform: scale(1.05); /* Slight zoom effect */
@@ -72,7 +91,8 @@ body {
 @media (max-width: 768px) {
   .nav-container {
     flex-direction: column;
-    align-items: flex-start;
+    align-items: center; /* Center the items vertically on small screens */
+    padding: 15px; /* Add more padding for smaller screens */
   }
 
   .nav-link {
@@ -85,7 +105,6 @@ body {
     margin-top: 10px;
   }
 }
-
 /* Style for the login container */
 .login-container {
   max-width: 400px; /* Restrict width for focus */
@@ -153,18 +172,69 @@ body {
 
 /* login page */
 /* Style for the login container */
+/* Container for the Login Form */
 .login-container {
-  width: 100%;
-  max-width: 300px; /* Reduced max-width to match the register form */
-  margin: 40px auto; /* Reduced margin for a more compact layout */
-  padding: 15px; /* Reduced padding */
+  max-width: 400px; /* Restrict width for focus */
+  margin: 50px auto; /* Center the container */
+  padding: 20px;
   border-radius: 8px; /* Rounded corners */
-  background-color: #2d3748; /* Dark background for consistency */
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.15); /* Smaller shadow */
+  background-color: #2b2b2b; /* Dark background, slightly lighter for contrast */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Light shadow for depth */
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 15px; /* Spacing between elements */
+}
+
+/* Style for input fields */
+.login-input {
+  width: 100%;
+  padding: 10px 15px;
+  border: 1px solid #4a4a4a; /* Dark border for subtle contrast */
+  border-radius: 6px; /* Rounded corners for smooth design */
+  font-size: 16px;
+  color: #fff; /* White text for readability */
+  background-color: #333; /* Slightly lighter dark background for inputs */
+  transition: border-color 0.3s ease;
+}
+
+/* Highlight input on focus */
+.login-input:focus {
+  border-color: #38b2ac; /* Teal for focus */
+  outline: none; /* Remove default outline */
+  box-shadow: 0 0 4px rgba(56, 178, 172, 0.5); /* Soft glow for focus */
+}
+
+/* Style for the login button */
+.login-btn {
+  width: 100%;
+  padding: 10px 15px;
+  background-color: #38b2ac; /* Teal for primary action */
+  color: #fff; /* White text for contrast */
+  border: none;
+  border-radius: 6px;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+/* Hover effect for the login button */
+.login-btn:hover {
+  background-color: #2c7a7b; /* Darker teal on hover */
+  transform: scale(1.02); /* Slight zoom */
+}
+
+/* Responsive design for small screens */
+@media (max-width: 480px) {
+  .login-container {
+    width: 90%; /* Adjust width for smaller screens */
+    padding: 15px; /* Reduced padding */
+  }
+
+  .login-input, .login-btn {
+    font-size: 14px; /* Adjust font size for smaller screens */
+  }
 }
 
 /* Title for the login form */
@@ -231,16 +301,16 @@ body {
 /*css for welcome message*/
 /* Style for the Welcome message */
 .welcome-message {
-  font-size: 24px; /* Adjust the font size */
-  font-weight: bold; /* Bold text */
-  color: #38b2ac; /* Teal color for the text */
-  text-align: center; /* Center the text */
-  padding: 10px; /* Padding around the text */
-  background-color: #2d3748; /* Dark background */
-  border-radius: 8px; /* Rounded corners */
-  margin: 20px auto; /* Center the element and add margin */
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Soft shadow for depth */
-  transition: transform 0.3s ease, opacity 0.3s ease; /* Smooth transitions */
+  font-size: 24px; /* Adjust the font size for prominence */
+  font-weight: bold; /* Bold text to highlight the message */
+  color: #38b2ac; /* Teal color for the text for contrast */
+  text-align: center; /* Center the text for better alignment */
+  padding: 15px; /* Padding for extra space around the text */
+  background-color: #2d2d2d; /* Darker background for consistency with theme */
+  border-radius: 8px; /* Rounded corners for a soft look */
+  margin: 20px auto; /* Center the element with auto margin */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Soft shadow for a floating effect */
+  transition: transform 0.3s ease, opacity 0.3s ease, background-color 0.3s ease; /* Smooth transitions */
 }
 
 /* Animation for the welcome message when it's shown */
@@ -254,45 +324,47 @@ body {
   transform: translateY(0);
 }
 
+
 /*register page*/
 /* Container for the entire registration form */
+/* Container for the Registration Form */
 .register-container {
   width: 100%;
   max-width: 300px; /* Reduced max-width for an even smaller form */
   margin: 40px auto; /* Slightly reduced margin for a tighter layout */
   padding: 15px; /* Reduced padding */
-  background-color: #2d3748; /* Dark background for the form */
+  background-color: #2d2d2d; /* Darker background for a sleek theme */
   color: #e2e8f0; /* Light text color for readability */
   border-radius: 8px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.15); /* Smaller shadow */
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.15); /* Smaller shadow for depth */
   display: flex;
   flex-direction: column;
-  gap: 10px; /* Reduced gap between elements */
+  gap: 15px; /* More space between elements */
 }
 
-/* Title for the registration form */
+/* Title for the Registration Form */
 .register-title {
-  font-size: 18px; /* Smaller font size */
+  font-size: 22px; /* Slightly bigger font size for emphasis */
   font-weight: bold;
   text-align: center;
   color: #38b2ac; /* Teal color for the title */
-  margin-bottom: 10px; /* Reduced margin */
+  margin-bottom: 15px; /* Margin below the title for spacing */
 }
 
 /* Form group styling */
 .form-group {
   display: flex;
   flex-direction: column;
-  gap: 6px; /* Even smaller gap */
+  gap: 10px; /* Slightly larger gap between elements */
 }
 
 /* Input field styling */
 .form-input {
-  padding: 8px 10px; /* Reduced padding */
-  font-size: 12px; /* Smaller font size */
-  border: 1px solid #cbd5e0; /* Light border */
+  padding: 10px 15px; /* More padding for better feel */
+  font-size: 14px; /* Slightly larger font size */
+  border: 1px solid #4a4a4a; /* Subtle border for a dark theme */
   border-radius: 6px;
-  background-color: #4a5568; /* Slightly darker background */
+  background-color: #3b3b3b; /* Darker background for inputs */
   color: #e2e8f0; /* Light text color */
   transition: border-color 0.3s ease, background-color 0.3s ease;
 }
@@ -300,18 +372,18 @@ body {
 /* Focus effect for input fields */
 .form-input:focus {
   border-color: #38b2ac; /* Teal color when focused */
-  background-color: #2d3748; /* Darker background when focused */
-  outline: none;
+  background-color: #2d2d2d; /* Slightly darker background on focus */
+  outline: none; /* Remove default outline */
 }
 
 /* Button styling */
 .btn {
-  padding: 8px 12px; /* Smaller padding */
+  padding: 10px 15px; /* Larger padding for a more clickable button */
   background-color: #38b2ac; /* Teal button color */
-  color: #f7fafc; /* Light text color for the button */
+  color: #f7fafc; /* Light text color for contrast */
   border: none;
   border-radius: 6px;
-  font-size: 12px; /* Smaller font size */
+  font-size: 14px; /* Slightly larger font size for readability */
   font-weight: bold;
   cursor: pointer;
   transition: background-color 0.3s ease, transform 0.2s ease;
@@ -320,45 +392,56 @@ body {
 /* Button hover effect */
 .btn:hover {
   background-color: #2c7a7b; /* Darker teal on hover */
-  transform: scale(1.05);
+  transform: scale(1.05); /* Slight zoom effect */
 }
 
 /* Make the form responsive */
 @media (max-width: 480px) {
   .register-container {
-      width: 90%;
-      padding: 12px; /* Reduced padding for mobile screens */
+      width: 90%; /* Adjust width for smaller screens */
+      padding: 12px; /* Slight padding adjustment */
   }
 
   .form-input {
-      font-size: 11px; /* Smaller font size for mobile */
+      font-size: 12px; /* Smaller font size for mobile */
   }
 
   .btn {
-      font-size: 11px; /* Smaller button text for mobile */
+      font-size: 12px; /* Smaller button text for mobile */
   }
 }
 
+/* Label styling */
 label {
   font-weight: 600;
-  margin-bottom: 6px; /* Reduced margin */
-  display: block;  /* Makes the label take a whole line */
-  color: #e2e8f0;  /* Light gray text for readability */
+  margin-bottom: 8px; /* Slightly larger margin for label */
+  display: block; /* Ensures label takes a full line */
+  color: #e2e8f0; /* Light gray text for readability */
 }
 
+/* Dropdown/select role field styling */
 .select-role {
   width: 100%;
-  padding: 8px 10px; /* Smaller padding */
-  border: 1px solid #cbd5e0;
+  padding: 10px 15px; /* Adjusted padding for select input */
+  border: 1px solid #4a4a4a; /* Subtle border color */
   border-radius: 6px;
-  font-size: 14px; /* Reduced font size */
+  font-size: 14px;
+  background-color: #3b3b3b; /* Matching background */
+  color: #e2e8f0; /* Light text color */
   transition: border-color 0.3s ease;
 }
 
+/* Focus effect for select input */
 .select-role:focus {
-  border-color: #38b2ac;  /* Teal for focus */
+  border-color: #38b2ac; /* Teal for focus */
   outline: none;
+  background-color: #2d2d2d; /* Darker background when focused */
 }
+
+
+
+
+
 
 /*admin dashboard*/
 /* Admin Dashboard Container */

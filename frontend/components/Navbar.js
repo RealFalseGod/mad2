@@ -14,13 +14,13 @@ export default {
     <button class="btn-logout" v-if="$store.state.loggedin" @click="logout">Logout</button>
   </div>
     `,
-    methods: {
-      logout() {
-        // Commit logout mutation
-        this.$store.commit('logout');
-        
-        // Redirect to login page after logout
-        this.$router.push('/login');
-      }
+  methods: {
+    logout () {
+      // Commit logout mutation
+      this.$store.commit('logout')
+
+      // Redirect to login page after logout
+      this.$router.push('/login')
     }
-};
+  }
+}
