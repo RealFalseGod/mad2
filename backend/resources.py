@@ -1,12 +1,13 @@
 from flask_restful import Api, Resource, fields, marshal_with
 from flask import request, current_app as app
-from backend.model import post, servicebooking, review, review_of_p,UserRoles
+from backend.model import post, servicebooking, review, review_of_p, UserRoles
 from flask_security import auth_required, current_user
 from backend.model import db, User
 from datetime import datetime
 from dateutil.parser import parse as parse_date
 from backend.celery.tasks import email
 from backend.celery.mail_service import send_email
+from sqlalchemy import func
 
 cache = app.cache
 
@@ -19,22 +20,21 @@ post_fields = {
     "content": fields.String,
     "price": fields.Integer,
     "user_id": fields.Integer,
-     "authorized": fields.Integer,
+    "authorized": fields.Integer,
 }
 post_fields2 = {
-    "id":fields.Integer,
+    "id": fields.Integer,
     "name": fields.String,
-    "service":  fields.String,
+    "service": fields.String,
     "content": fields.String,
-    "price":fields.Integer,
+    "price": fields.Integer,
     "user_id": fields.Integer,
     "username": fields.String,  # Access the associated user's username
-    "total_jobs":fields.Integer,  # Total number of jobs the user has done
-    "average_stars":fields.Float,
-    "pincode":fields.Integer,
-    "address":fields.String,
-     "authorized": fields.Integer,
-
+    "total_jobs": fields.Integer,  # Total number of jobs the user has done
+    "average_stars": fields.Float,
+    "pincode": fields.Integer,
+    "address": fields.String,
+    "authorized": fields.Integer,
 }
 
 user_fields = {
@@ -55,7 +55,7 @@ get_fields = {
     "pincode": fields.String,
     "roles": fields.List(fields.String(attribute="name")),
     "active": fields.Boolean,
-    "role":fields.String,
+    "role": fields.String,
 }
 
 booking_fields = {
@@ -89,7 +89,7 @@ get_booking_fields_for_user = {
             "service": fields.String,  # The service offered in the post
             "price": fields.Integer,  # The price of the service
             "username": fields.String,  # Username of the person who created the post
-             "authorized": fields.Integer,
+            "authorized": fields.Integer,
         }
     ),
 }
@@ -115,19 +115,20 @@ post_fields3 = {
     "user_id": fields.Integer,
     "name": fields.String,
     "content": fields.String,
-    "service":fields.String,
+    "service": fields.String,
     "price": fields.Float,
     "authorized": fields.Integer,
 }
 
 response_fields = {
     "user_role": fields.String,
-    "jobs_done":fields.Integer,
-    "stars":fields.Float,
+    "jobs_done": fields.Integer,
+    "stars": fields.Float,
     "bookings": fields.List(fields.Nested(user_booking_fields)),
     "reviews": fields.List(fields.Nested(review_fields)),
     "posts": fields.List(fields.Nested(post_fields3)),
 }
+
 
 class user_list(Resource):
     @auth_required("token")
@@ -184,7 +185,7 @@ class get_user(Resource):
         else:
             users = User.query.get(user_id)
             role = UserRoles.query.filter_by(user_id=user_id).first().role_id
-            print(users,role)
+            print(users, role)
             return users
 
 
@@ -217,7 +218,9 @@ class post_api(Resource):
                 )  # Clear the cache after deleting a post
             except:
                 db.session.rollback()
-                return {"message": "Cannot delete a approved post with service history"}, 500
+                return {
+                    "message": "Cannot delete a approved post with service history"
+                }, 500
         else:
             return {"message": "You are not authorized to delete this post"}, 403
 
@@ -275,7 +278,7 @@ class postlist_api(Resource):
     def post(self):  # Create a new post
         data = request.get_json()
         c = post.query.filter_by(user_id=current_user.id, authorized=1).count()
-        if c>=2:
+        if c >= 2:
             return {"message": "Cant create more than 2 posts"}, 500
         new_post = post(
             name=data.get("name"),
@@ -300,9 +303,9 @@ class postlist2(Resource):
     @cache.cached(timeout=10, key_prefix="postlist2")
     @marshal_with(post_fields2)
     def get(self):
-        postssssss =  post.query.filter_by(authorized=1).all()
+        postssssss = post.query.filter_by(authorized=1).all()
         services = []
-        
+
         for posts in postssssss:
             user = User.query.get(posts.user_id)  # Fetch the user for the current post
             user_review = review_of_p.query.filter_by(p_id=posts.user_id).first()
@@ -319,11 +322,11 @@ class postlist2(Resource):
                     "username": user.username,  # Access the associated user's username
                     "total_jobs": total_jobs,  # Total number of jobs the user has done
                     "average_stars": average_stars,
-                    "pincode":user.pincode,
-                    "address":user.address
+                    "pincode": user.pincode,
+                    "address": user.address,
                 }
             )
-       
+
         return services
 
     @auth_required("token")
@@ -364,9 +367,13 @@ class bookings(Resource):
         print(post_count, 1111)
         if post_count >= 5:
             return {"message": "Cant book more than 5 services"}, 500
-        existing_booking = servicebooking.query.filter_by(
-            user_id=user_id, post_id=post_id, booking_date=booking_date,status=''
-        ).filter(servicebooking.status != 'rejected').first()
+        existing_booking = (
+            servicebooking.query.filter_by(
+                user_id=user_id, post_id=post_id, booking_date=booking_date, status=""
+            )
+            .filter(servicebooking.status != "rejected")
+            .first()
+        )
 
         if existing_booking:
             return {"message": "You have already booked this service on this day"}, 400
@@ -575,6 +582,7 @@ class accept_booking(Resource):
             db.session.rollback()
             return {"message": f"Error accepting booking: {str(e)}"}, 500
 
+
 class cancel_booking(Resource):
     @auth_required("token")
     def put(self, booking_id):
@@ -584,7 +592,7 @@ class cancel_booking(Resource):
         if not booking:
             return {"message": "Booking not found"}, 404
         try:
-            booking.status = "canceled"  
+            booking.status = "canceled"
             db.session.commit()
             subject = "Your Booking Has Been canceled"
             content = f"""
@@ -598,6 +606,7 @@ class cancel_booking(Resource):
         except Exception as e:
             db.session.rollback()
             return {"message": f"Error canceling booking: {str(e)}"}, 500
+
 
 class done_and_review(Resource):
     @auth_required("token")
@@ -625,20 +634,21 @@ class done_and_review(Resource):
                 total_jobs = user_review_of_p.no_of_job
                 # Calculate the new average star rating
                 # Assuming you want to keep a running average
-                updated_avg_star = (new_star+ star_rating)/2
+                updated_avg_star = (new_star + star_rating) / 2
                 user_review_of_p.star = updated_avg_star
             else:
-                 user_review_of_p = review_of_p(
+                user_review_of_p = review_of_p(
                     p_id=p_id,
                     no_of_job=1,  # First job done
-                    star=star_rating  # Set the initial star rating
+                    star=star_rating,  # Set the initial star rating
                 )
-                 db.session.add(user_review_of_p)
+                db.session.add(user_review_of_p)
             db.session.commit()
             return {"message": "review done successfully"}, 200
         except Exception as e:
             db.session.rollback()
             return {"message": f"Error review failed: {str(e)}"}, 500
+
 
 class admin_bookings_for_user(Resource):
     @auth_required("token")
@@ -678,11 +688,12 @@ class admin_bookings_for_user(Resource):
                 "bookings": bookings,
                 "reviews": reviews,
                 "posts": posts,
-                "jobs_done":jobs_done,
-                "stars":stars,
+                "jobs_done": jobs_done,
+                "stars": stars,
             }
 
         return {"message": "Invalid user role"}, 400
+
 
 class get_postlist(Resource):
 
@@ -692,7 +703,8 @@ class get_postlist(Resource):
     def get(self):
         posts = post.query.filter_by(user_id=current_user.id).all()
         return posts
-    
+
+
 class get_authpostlist(Resource):
 
     @auth_required("token")
@@ -701,6 +713,8 @@ class get_authpostlist(Resource):
     def get(self):
         posts = post.query.all()
         return posts
+
+
 class authorize(Resource):
     @auth_required("token")
     def patch(self, post_id):
@@ -711,6 +725,7 @@ class authorize(Resource):
         posts.authorized = 1
         db.session.commit()
         return {"message": "Post authorized successfully"}, 200
+
 
 class unauthorize(Resource):
     @auth_required("token")
@@ -724,7 +739,233 @@ class unauthorize(Resource):
         return {"message": "Post unauthorized successfully"}, 200
 
 
+class get_admin_stats(Resource):
+    admin_stats_fields = {
+        "total_active_users": fields.Integer,
+        "staff_users": fields.Integer,
+        "regular_users": fields.Integer,
+        "total_reviews_count": fields.Integer,
+        "average_rating": fields.Float,
+        "recent_reviews": fields.List(
+            fields.Nested(
+                {
+                    "user_id": fields.Integer,
+                    "post_id": fields.Integer,
+                    "star": fields.Integer,
+                    "content": fields.String,
+                }
+            )
+        ),
+        "top_3_staff_by_reviews": fields.List(
+            fields.Nested(
+                {
+                    "id": fields.Integer,
+                    "username": fields.String,
+                    "star": fields.Float,
+                }
+            )
+        ),
+        "total_jobs_done": fields.Integer,
+        "total_requests_this_month": fields.Integer,
+        "total_requests_expired_this_month": fields.Integer,
+        "total_jobs_this_month": fields.Integer,
+        "total_pending_this_month": fields.Integer,
+    }
 
+    @auth_required("token")
+    @marshal_with(admin_stats_fields)
+    def get(self):
+        print("works")
+        active_users_count = User.query.filter_by(active=True).count() - 1
+
+        # Count staff users
+        staff_users_count = (
+            db.session.query(User)
+            .join(UserRoles)
+            .filter(
+                User.active == True,  # Ensure the user is active
+                UserRoles.role_id == 3,  # Ensure the user has role_id 2
+            )
+            .count()
+        )
+        total_reviews_count = review.query.count()
+        average_rating = db.session.query(db.func.avg(review.star)).scalar()
+        recent_reviews = (
+            db.session.query(
+                review.user_id, review.post_id, review.star, review.content
+            )
+            .order_by(review.id.desc())
+            .limit(5)
+            .all()
+        )
+        # Count regular users
+        regular_users_count = (
+            db.session.query(User)
+            .join(UserRoles)
+            .filter(
+                User.active == True,
+                UserRoles.role_id == 2,
+            )
+            .count()
+        )
+        top_3_staff_by_reviews = (
+            db.session.query(
+                User.id,  # User ID
+                User.username,  # Assuming there's a 'username' field
+                review_of_p.star,
+            )
+            .join(
+                review_of_p,
+                review_of_p.p_id == User.id,
+            )
+            .order_by(review_of_p.star.desc())
+            .limit(3)
+            .all()
+        )
+        total_jobs_done = (
+            db.session.query(func.count(servicebooking.id))
+            .filter(servicebooking.status == "done")
+            .scalar()
+        )
+        total_requests_this_month = (
+            db.session.query(func.count(servicebooking.id))
+            .filter(
+                func.extract("month", servicebooking.booking_date)
+                == datetime.now().month,
+                func.extract("year", servicebooking.booking_date)
+                == datetime.now().year,
+            )
+            .scalar()
+        )
+        total_requests_expired_this_month = (
+            db.session.query(func.count(servicebooking.id))
+            .filter(
+                func.extract("month", servicebooking.booking_date)
+                == datetime.now().month,
+                func.extract("year", servicebooking.booking_date)
+                == datetime.now().year,
+                servicebooking.status == "expired",
+            )
+            .scalar()
+        )
+        total_jobs_this_month = (
+            db.session.query(func.count(servicebooking.id))
+            .filter(
+                func.extract("month", servicebooking.booking_date)
+                == datetime.now().month,
+                func.extract("year", servicebooking.booking_date)
+                == datetime.now().year,
+                servicebooking.status == "done",
+            )
+            .scalar()
+        )
+        total_pending_this_month = (
+            db.session.query(func.count(servicebooking.id))
+            .filter(
+                func.extract("month", servicebooking.booking_date)
+                == datetime.now().month,
+                func.extract("year", servicebooking.booking_date)
+                == datetime.now().year,
+                servicebooking.status == "accepted",
+            )
+            .scalar()
+        )
+
+        response_data = {
+            "total_active_users": active_users_count,
+            "staff_users": staff_users_count,
+            "regular_users": regular_users_count,
+            "total_reviews_count": total_reviews_count,
+            "average_rating": average_rating,
+            "recent_reviews": [
+                {
+                    "user_id": review.user_id,
+                    "post_id": review.post_id,
+                    "star": review.star,
+                    "content": review.content,
+                }
+                for review in recent_reviews
+            ],
+            "top_3_staff_by_reviews": [
+                {
+                    "id": staff[0],
+                    "username": staff[1],
+                    "star": staff[2],
+                }
+                for staff in top_3_staff_by_reviews
+            ],
+            "total_jobs_done": total_jobs_done,
+            "total_requests_this_month": total_requests_this_month,
+            "total_requests_expired_this_month": total_requests_expired_this_month,
+            "total_jobs_this_month": total_jobs_this_month,
+            "total_pending_this_month": total_pending_this_month,
+        }
+
+        return response_data
+
+class get_staff_stats(Resource):
+    staff_stats_fields = {
+        "total_jobs_done": fields.Integer,
+        "total_jobs_to_do": fields.Integer,
+        "total_jobs_requests": fields.Integer,
+        "rating": fields.Float,
+        "recent_reviews": fields.List(fields.Nested(review_fields)),
+    }
+    @auth_required("token")
+    def get(self):
+        p_id=current_user.id
+        total_jobs_done = (
+            db.session.query(func.count(servicebooking.id))
+            .join(post, post.id == servicebooking.post_id)  # Join post table using post_id
+            .filter(
+            servicebooking.status == "done",  # Filter for completed jobs
+            post.user_id == p_id  # Match the desired staff_id from post table
+            )
+    .scalar()
+        
+)       
+        total_jobs_to_do = (
+            db.session.query(func.count(servicebooking.id))
+            .join(post, post.id == servicebooking.post_id)  # Join post table using post_id
+            .filter(
+            servicebooking.status == "accepted",  # Filter for completed jobs
+            post.user_id == p_id  # Match the desired staff_id from post table
+            )
+    .scalar()        
+)
+        total_jobs_requests = (
+            db.session.query(func.count(servicebooking.id))
+            .join(post, post.id == servicebooking.post_id)  # Join post table using post_id
+            .filter(
+            servicebooking.status == "pending",  # Filter for completed jobs
+            post.user_id == p_id  # Match the desired staff_id from post table
+            )
+    .scalar()        
+)
+        print(total_jobs_done,total_jobs_to_do,total_jobs_requests)
+        r = review_of_p.query.filter_by(p_id=p_id).first()
+        rating=0
+        if r:
+            rating=int(r.star)
+        revs = review.query.filter_by(p_id=p_id).order_by(review.id.desc()).limit(3).all()
+
+        response_data = {
+            "total_jobs_done": total_jobs_done,
+            "total_jobs_to_do": total_jobs_to_do,
+            "total_jobs_requests": total_jobs_requests,
+            "rating": rating,
+            "recent_reviews": [
+                {
+                    "user_id": rev.user_id,
+                    "post_id": rev.post_id,
+                    "star": int(rev.star),
+                    "content": rev.content
+                }
+                for rev in revs
+            ]
+        }
+
+        return response_data
 
 api.add_resource(user_list, "/users", endpoint="users_list")
 api.add_resource(user_list, "/users/<int:user_id>")
@@ -746,3 +987,5 @@ api.add_resource(get_postlist, "/get_postlist")
 api.add_resource(get_authpostlist, "/get_authpostlist")
 api.add_resource(authorize, "/authorize/<int:post_id>")
 api.add_resource(unauthorize, "/unauthorize/<int:post_id>")
+api.add_resource(get_admin_stats, "/get_admin_stat")
+api.add_resource(get_staff_stats, "/get_staff_stat")

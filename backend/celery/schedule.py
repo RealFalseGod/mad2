@@ -1,6 +1,6 @@
 from celery.schedules import crontab
 from flask import current_app as app
-from backend.celery.tasks import email,send_tomorrow_reminders
+from backend.celery.tasks import email,send_tomorrow_reminders,expire_requests
 
 
 celery_app = app.extensions["celery"]
@@ -10,6 +10,7 @@ def setup_periodic_tasks(sender, **kwargs):
     #sender.add_periodic_task(crontab(hour=17, minute=3), email.s('user@gmail.com', 'reminder to login', '<h1>login to your account</h1>'), name='daily reminder')
     #sender.add_periodic_task(crontab(hour=5, minute=14, day_of_week='monday'), email.s('user@gmail.com', 'reminder to login', '<h1>login to your account</h1>'), name='weekly reminder')
     sender.add_periodic_task(crontab(hour=17, minute=0), send_tomorrow_reminders_task.s(), name='Daily service reminder')
+    sender.add_periodic_task(crontab(hour=17, minute=0), name='service expired')
 
 
 @celery_app.task
@@ -23,3 +24,11 @@ def send_tomorrow_reminders_task():
         print("Successfully sent tomorrow's service reminders.")
     except Exception as e:
         print(f"Error sending reminders: {e}")
+
+@celery_app.task
+def haha_expired():
+    try:
+        expire_requests()  # Call your email reminder function
+        print("it expired.")
+    except Exception as e:
+        print(f"Error sending exprieres: {e}")

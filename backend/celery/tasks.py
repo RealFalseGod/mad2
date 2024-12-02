@@ -25,6 +25,7 @@ def email(to,subject,content):
 
 @shared_task(ignore_result = False)
 def send_tomorrow_reminders():
+
     tomorrow = datetime.now() + timedelta(days=1)
     tomorrow_date = tomorrow.date()
     bookings = servicebooking.query.filter(
@@ -77,3 +78,25 @@ def send_tomorrow_reminders():
         print(f"Reminder sent to {user.email} and {staff.email}")
     except Exception as e:
         print(f"Failed to send reminders for booking ID {booking.id}: {e}")
+
+@shared_task(ignore_result = False)
+def expire_requests():
+    current_datetime = datetime.utcnow()
+    requests_to_expire = db.session.query(servicebooking).filter(
+        servicebooking.status.in_(['pending', 'accepted']),  # Ensure the request is either pending or accepted
+        servicebooking.booking_date < current_datetime  # Ensure the request date has passed
+    ).all()
+    for request in requests_to_expire:
+        request.status = 'expired'
+    for request in requests_to_expire:
+        subject = "Booking expired"
+        content = f"""
+            <h1>Booking Confirmed</h1>
+            <p>Dear {request.user.username},</p>
+            <p>Your booking for the service id :<strong>{request.id}</strong> has expired .</p>
+            <p>Thank you for using our service!</p>
+            """
+        send_email(request.user.email,subject,content)
+    
+    # Commit the changes to the database
+    db.session.commit()
