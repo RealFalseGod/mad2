@@ -86,7 +86,8 @@ export default {
             });
             if (res.ok) {
                 alert("Post edited successfully!");
-                this.$router.push('/services');
+                this.$router.push('/posts');
+                
             } else {
                 alert("Post edit failed!");
             }

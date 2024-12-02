@@ -19,6 +19,7 @@ post_fields = {
     "content": fields.String,
     "price": fields.Integer,
     "user_id": fields.Integer,
+     "authorized": fields.Integer,
 }
 post_fields2 = {
     "id":fields.Integer,
@@ -31,7 +32,9 @@ post_fields2 = {
     "total_jobs":fields.Integer,  # Total number of jobs the user has done
     "average_stars":fields.Float,
     "pincode":fields.Integer,
-    "address":fields.String
+    "address":fields.String,
+     "authorized": fields.Integer,
+
 }
 
 user_fields = {
@@ -86,6 +89,7 @@ get_booking_fields_for_user = {
             "service": fields.String,  # The service offered in the post
             "price": fields.Integer,  # The price of the service
             "username": fields.String,  # Username of the person who created the post
+             "authorized": fields.Integer,
         }
     ),
 }
@@ -113,6 +117,7 @@ post_fields3 = {
     "content": fields.String,
     "service":fields.String,
     "price": fields.Float,
+    "authorized": fields.Integer,
 }
 
 response_fields = {
@@ -204,6 +209,7 @@ class post_api(Resource):
 
         if (post_instance.user_id == current_user.id) or current_user.has_role("admin"):
             try:
+                print("jajaj")
                 db.session.delete(post_instance)
                 db.session.commit()
                 cache.delete_memoized(
@@ -211,7 +217,7 @@ class post_api(Resource):
                 )  # Clear the cache after deleting a post
             except:
                 db.session.rollback()
-                return {"message": "Error deleting post"}, 500
+                return {"message": "Cannot delete a approved post with service history"}, 500
         else:
             return {"message": "You are not authorized to delete this post"}, 403
 
@@ -231,6 +237,7 @@ class post_api(Resource):
                 post_instance.service = data.get("service")
                 post_instance.content = data.get("content")
                 post_instance.price = data.get("price")
+                post_instance.authorized = 0
                 db.session.commit()
                 cache.delete_memoized(
                     post_api.get, post_id
@@ -267,7 +274,7 @@ class postlist_api(Resource):
     @auth_required("token")
     def post(self):  # Create a new post
         data = request.get_json()
-        c = post.query.filter_by(user_id=current_user.id).count()
+        c = post.query.filter_by(user_id=current_user.id, authorized=1).count()
         if c>=2:
             return {"message": "Cant create more than 2 posts"}, 500
         new_post = post(
@@ -293,9 +300,9 @@ class postlist2(Resource):
     @cache.cached(timeout=10, key_prefix="postlist2")
     @marshal_with(post_fields2)
     def get(self):
-        postssssss = post.query.all()
+        postssssss =  post.query.filter_by(authorized=1).all()
         services = []
-        print(postssssss)
+        
         for posts in postssssss:
             user = User.query.get(posts.user_id)  # Fetch the user for the current post
             user_review = review_of_p.query.filter_by(p_id=posts.user_id).first()
@@ -316,7 +323,7 @@ class postlist2(Resource):
                     "address":user.address
                 }
             )
-        print(services)
+       
         return services
 
     @auth_required("token")
@@ -686,7 +693,37 @@ class get_postlist(Resource):
         posts = post.query.filter_by(user_id=current_user.id).all()
         return posts
     
-    
+class get_authpostlist(Resource):
+
+    @auth_required("token")
+    @cache.cached(timeout=10, key_prefix="get_authpostlist")
+    @marshal_with(post_fields)
+    def get(self):
+        posts = post.query.all()
+        return posts
+class authorize(Resource):
+    @auth_required("token")
+    def patch(self, post_id):
+        posts = post.query.get(post_id)
+        if not posts:
+            return {"message": "Post not found"}, 404
+
+        posts.authorized = 1
+        db.session.commit()
+        return {"message": "Post authorized successfully"}, 200
+
+class unauthorize(Resource):
+    @auth_required("token")
+    def patch(self, post_id):
+        posts = post.query.get(post_id)
+        if not post:
+            return {"message": "Post not found"}, 404
+
+        posts.authorized = 0
+        db.session.commit()
+        return {"message": "Post unauthorized successfully"}, 200
+
+
 
 
 api.add_resource(user_list, "/users", endpoint="users_list")
@@ -706,3 +743,6 @@ api.add_resource(done_and_review, "/review/<int:booking_id>")
 api.add_resource(postlist2, "/post_list")
 api.add_resource(admin_bookings_for_user, "/admin_book/<int:user_id>")
 api.add_resource(get_postlist, "/get_postlist")
+api.add_resource(get_authpostlist, "/get_authpostlist")
+api.add_resource(authorize, "/authorize/<int:post_id>")
+api.add_resource(unauthorize, "/unauthorize/<int:post_id>")

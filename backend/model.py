@@ -51,7 +51,7 @@ class post(db.Model):
     price = db.Column(db.Integer, nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
     user = db.relationship("User", backref="posts")
-
+    authorized= db.Column(db.Integer,default=0)
     def __repr__(self):
         return (
             f"<post(id={self.id}, service='{self.service}', content='{self.content}')>"

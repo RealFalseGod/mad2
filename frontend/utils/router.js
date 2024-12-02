@@ -16,6 +16,7 @@ import bookings from "../pages/bookings.js";
 import info from "../pages/info.js";
 import view_request from "../pages/view_request.js";
 import my_bookings from "../pages/my_bookings.js";
+import authorized from "../pages/authorized.js";
 
 const routes = [
     { path: "/", component: home },
@@ -31,6 +32,8 @@ const routes = [
     { path: "/info/:id", component: info, props: true, meta: { requiresAuth: true, role : 'admin' } },
     { path: "/view_request", component: view_request, meta: { requiresAuth: true, role : 'staff' } },
     { path: "/my_bookings", component: my_bookings, meta: { requiresAuth: true } },
+    { path: "/authorized/", component: authorized, meta: { requiresAuth: true, role : 'admin' } },
+    
 ];
 
 const router = new VueRouter({ routes });
