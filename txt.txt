@@ -1,1 +1,7 @@
 fuser -k 5000/tcp
+celery -A app:celery_app worker -l INFO
+source .venv/bin/activate
+celery -A app:celery_app beat
+~/go/bin/MailHog
+sudo systemctl enable redis-server
+sudo systemctl start redis-server   
