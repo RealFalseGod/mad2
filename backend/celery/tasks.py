@@ -1,16 +1,26 @@
+
+
+
 from celery import shared_task
 import time
 import flask_excel
-from backend.model import post,servicebooking,db,User
+from backend.model import post,servicebooking,db,User,UserRoles
 from backend.celery.mail_service import send_email
 from datetime import datetime, timedelta
+from sqlalchemy import extract
 
 @shared_task(bind = True, ignore_result = False)
 def create_csv(self):
-    resource = post.query.all()
+    current_month = datetime.now().month
+    current_year = datetime.now().year
+    resource = servicebooking.query.filter(
+    extract('month', servicebooking.booking_date) == current_month,
+    extract('year', servicebooking.booking_date) == current_year,
+    servicebooking.status == 'done'  # Assuming 'done' is the status you're looking for
+).all()
     task_id = self.request.id
     filename = f'blog_data_{task_id}.csv'
-    column_names = [column.name for column in post.__table__.columns]
+    column_names = [column.name for column in servicebooking.__table__.columns]
     # print(column_names)
     csv_out = flask_excel.make_response_from_query_sets(resource, column_names = column_names, file_type='csv' )
 
@@ -100,3 +110,70 @@ def expire_requests():
     
     # Commit the changes to the database
     db.session.commit()
+
+def monthly_report(user):
+    current_month = datetime.now().month
+    current_year = datetime.now().year
+    # Assuming `ServiceBooking` is your SQLAlchemy model
+    subject = "Monthly report"
+    service_bookings = servicebooking.query.filter(servicebooking.user_id==user.id,
+        extract("month", servicebooking.booking_date) == current_month,
+        extract("year", servicebooking.booking_date) == current_year
+    ).all()
+    report_html = generate_html_report(service_bookings)
+    send_email(user.email,subject,report_html)
+
+
+def generate_html_report(bookings):
+    if not bookings:
+        return "<p>No bookings made this month.</p>"
+
+    # Start HTML content
+    html = """
+    <html>
+    <body>
+        <h1>Monthly Service Bookings Report</h1>
+        <p>Here are the details of the bookings made this month:</p>
+        <table border="1" style="border-collapse: collapse; width: 100%;">
+            <thead>
+                <tr>
+                    <th>Booking ID</th>
+                    <th>User ID</th>
+                    <th>Post_id</th>
+                    <th>Status</th>
+                    <th>Booking Date</th>
+                </tr>
+            </thead>
+            <tbody>
+    """
+
+    # Add rows for each booking
+    for booking in bookings:
+        html += f"""
+        <tr>
+            <td>{booking.id}</td>
+            <td>{booking.user_id}</td>
+            <td>{booking.post_id}</td>
+            <td>{booking.status}</td>
+            <td>{booking.booking_date.strftime('%Y-%m-%d')}</td>
+        </tr>
+        """
+
+    # End HTML content
+    html += """
+            </tbody>
+        </table>
+    </body>
+    </html>
+    """
+
+    return html
+
+@shared_task(ignore_result = False)
+def send_each_user():
+    users_with_role = db.session.query(User).join(
+            UserRoles, UserRoles.user_id == User.id
+        ).filter(UserRoles.role_id == 2).all()
+    print(users_with_role)
+    for u in users_with_role:
+        monthly_report(u)

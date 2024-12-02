@@ -8,6 +8,7 @@ from dateutil.parser import parse as parse_date
 from backend.celery.tasks import email
 from backend.celery.mail_service import send_email
 from sqlalchemy import func
+from sqlalchemy import extract
 
 cache = app.cache
 
@@ -903,6 +904,7 @@ class get_admin_stats(Resource):
 
         return response_data
 
+
 class get_staff_stats(Resource):
     staff_stats_fields = {
         "total_jobs_done": fields.Integer,
@@ -911,43 +913,51 @@ class get_staff_stats(Resource):
         "rating": fields.Float,
         "recent_reviews": fields.List(fields.Nested(review_fields)),
     }
+
     @auth_required("token")
     def get(self):
-        p_id=current_user.id
+        p_id = current_user.id
         total_jobs_done = (
             db.session.query(func.count(servicebooking.id))
-            .join(post, post.id == servicebooking.post_id)  # Join post table using post_id
+            .join(
+                post, post.id == servicebooking.post_id
+            )  # Join post table using post_id
             .filter(
-            servicebooking.status == "done",  # Filter for completed jobs
-            post.user_id == p_id  # Match the desired staff_id from post table
+                servicebooking.status == "done",  # Filter for completed jobs
+                post.user_id == p_id,  # Match the desired staff_id from post table
             )
-    .scalar()
-        
-)       
+            .scalar()
+        )
         total_jobs_to_do = (
             db.session.query(func.count(servicebooking.id))
-            .join(post, post.id == servicebooking.post_id)  # Join post table using post_id
+            .join(
+                post, post.id == servicebooking.post_id
+            )  # Join post table using post_id
             .filter(
-            servicebooking.status == "accepted",  # Filter for completed jobs
-            post.user_id == p_id  # Match the desired staff_id from post table
+                servicebooking.status == "accepted",  # Filter for completed jobs
+                post.user_id == p_id,  # Match the desired staff_id from post table
             )
-    .scalar()        
-)
+            .scalar()
+        )
         total_jobs_requests = (
             db.session.query(func.count(servicebooking.id))
-            .join(post, post.id == servicebooking.post_id)  # Join post table using post_id
+            .join(
+                post, post.id == servicebooking.post_id
+            )  # Join post table using post_id
             .filter(
-            servicebooking.status == "pending",  # Filter for completed jobs
-            post.user_id == p_id  # Match the desired staff_id from post table
+                servicebooking.status == "pending",  # Filter for completed jobs
+                post.user_id == p_id,  # Match the desired staff_id from post table
             )
-    .scalar()        
-)
-        print(total_jobs_done,total_jobs_to_do,total_jobs_requests)
+            .scalar()
+        )
+        print(total_jobs_done, total_jobs_to_do, total_jobs_requests)
         r = review_of_p.query.filter_by(p_id=p_id).first()
-        rating=0
+        rating = 0
         if r:
-            rating=int(r.star)
-        revs = review.query.filter_by(p_id=p_id).order_by(review.id.desc()).limit(3).all()
+            rating = int(r.star)
+        revs = (
+            review.query.filter_by(p_id=p_id).order_by(review.id.desc()).limit(3).all()
+        )
 
         response_data = {
             "total_jobs_done": total_jobs_done,
@@ -959,13 +969,66 @@ class get_staff_stats(Resource):
                     "user_id": rev.user_id,
                     "post_id": rev.post_id,
                     "star": int(rev.star),
-                    "content": rev.content
+                    "content": rev.content,
                 }
                 for rev in revs
-            ]
+            ],
         }
 
         return response_data
+
+
+class get_user_stats(Resource):
+    user_stats_fields = {
+    "total_jobs_done": fields.Integer,
+    "total_jobs_pending": fields.Integer,
+    "jobs_rejected_this_month": fields.Integer,
+    "last_two_reviews": fields.List(fields.Nested(review_fields)),
+}
+    @auth_required("token")
+
+    def get(self):
+        print("haha")
+        ui = current_user.id
+        total_jobs_done = servicebooking.query.filter_by(user_id=ui, status="done").count()
+        total_jobs_pending = servicebooking.query.filter_by(
+            user_id=ui, status="accepted"
+        ).count()
+        last_two_reviews = (
+            review.query.filter_by(user_id=ui)
+            .order_by(
+                review.id.desc()
+            )  # Replace 'id' with 'timestamp' if that's the ordering field
+            .limit(2)
+            .all()
+        )
+        current_month = datetime.now().month
+        current_year = datetime.now().year
+        jobs_rejected_this_month = servicebooking.query.filter(
+            servicebooking.user_id == ui,  # Match the specific user
+            servicebooking.status == "rejected",  # Filter for rejected jobs
+            extract("month", servicebooking.booking_date)
+            == current_month,  # Filter for the current month
+            extract("year", servicebooking.booking_date)
+            == current_year,  # Filter for the current year
+        ).count()  # Get the count of such jobs
+        print(total_jobs_pending,total_jobs_done,last_two_reviews,jobs_rejected_this_month)
+        data = {
+                "total_jobs_done": total_jobs_done,
+                "total_jobs_pending": total_jobs_pending,
+                "jobs_rejected_this_month": jobs_rejected_this_month,
+                "last_two_reviews": [
+                    {
+                    "post_id": r.post_id,
+                    "star": int(r.star),
+                    "content": r.content,
+                    }
+                    for r in last_two_reviews
+                ] if last_two_reviews else [],
+            }
+        
+        return data
+
 
 api.add_resource(user_list, "/users", endpoint="users_list")
 api.add_resource(user_list, "/users/<int:user_id>")
@@ -989,3 +1052,4 @@ api.add_resource(authorize, "/authorize/<int:post_id>")
 api.add_resource(unauthorize, "/unauthorize/<int:post_id>")
 api.add_resource(get_admin_stats, "/get_admin_stat")
 api.add_resource(get_staff_stats, "/get_staff_stat")
+api.add_resource(get_user_stats, "/get_user_stat")

@@ -78,26 +78,65 @@ export default {
 
 </div>
 
-    <div v-if="userRole === 'user'">
-        <!-- User-specific content -->
-        <p>User profile, service bookings, reviews, etc.</p>
-    </div>
+<div v-if="userRole === 'user'">
+<!-- User-specific content -->
+<h2>User Dashboard</h2>
+<p>Welcome to your profile! Here are your stats:</p>
+
+<!-- Total Jobs Done -->
+<div>
+    <h3>Total Jobs Done</h3>
+    <p>{{ userstats.total_jobs_done }}</p>
+</div>
+
+<!-- Total Jobs Pending -->
+<div>
+    <h3>Total Jobs Pending</h3>
+    <p>{{ userstats.total_jobs_pending }}</p>
+</div>
+
+<!-- Jobs Rejected This Month -->
+<div>
+    <h3>Jobs Rejected This Month</h3>
+    <p>{{ userstats.jobs_rejected_this_month }}</p>
+</div>
+
+<!-- Last Two Reviews -->
+<div>
+    <h3>Last Two Reviews</h3>
+    <ul v-if="userstats.last_two_reviews && userstats.last_two_reviews.length">
+        <li v-for="(review, index) in userstats.last_two_reviews" :key="index">
+            <strong>Post_id ID:</strong> {{ review.post_id }} <br>
+            <strong>Rating:</strong> {{ review.star }} Stars <br>
+            <strong>Comment:</strong> {{ review.content }} <br>
+        </li>
+    </ul>
+    <p v-else>No reviews available.</p>
+</div>
+</div>
 </div>
     `,
     data() {
         return {
             userRole: '', // This will hold the role of the current user (admin, staff, or user)
             adminStats: null, // Holds the admin statistics
-            staffstats: null
+            staffstats: null,
+            userstats: null,
+            
         };
     },
     mounted() {
         this.fetchUserRole();
-        if (this.userRole === 'admin') {
-            this.get_adminstats(); // Fetch admin stats if the user is admin
-        }
-        if (this.userRole === 'staff') {
-            this.get_staffstats(); // Fetch admin stats if the user is admin
+        switch (this.userRole) {
+            case 'admin':
+                this.get_adminstats();
+                break;
+            case 'staff':
+                this.get_staffstats();
+                break;
+            case 'user':
+                this.get_userstats();
+                break;
         }
     },
     methods: {
@@ -141,7 +180,28 @@ export default {
                 console.log(d)
                 if (res.ok) {
                     this.staffstats = d;
-                    console.log(this.staffstats,"11");
+                    
+                } else {
+                    console.error('Error fetching staff stats:', d.message);
+                }
+            } catch (error) {
+                console.error('Error fetching staff stats:', error);
+            }
+        },
+        async get_userstats() {
+            try {
+                const res = await fetch(location.origin + '/api/get_user_stat', {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'auth-token': this.$store.state.auth_token,
+                    }
+                });
+                const d = await res.json();
+                console.log(d)
+                if (res.ok) {
+                    this.userstats = d;
+                   
                 } else {
                     console.error('Error fetching staff stats:', d.message);
                 }
