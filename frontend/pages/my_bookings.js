@@ -1,76 +1,91 @@
 export default {
   template: `
-  <div class="bookings">
-  <h1>Your Bookings</h1>
+  <div class="post-list-container">
+    <h1>Your Bookings</h1>
 
-  <!-- Filter options -->
-  <div>
-    <label for="statusFilter">Filter by Status:</label>
-    <select v-model="statusFilter" @change="filterBookings">
-      <option value="pending">Pending</option>
-      <option value="rejected">Rejected</option>
-      <option value="accepted">Accepted</option>
-    </select>
-  </div>
+    <!-- Filter options -->
+    <div class="search-bar">
+        <label for="statusFilter">Filter by Status:</label>
+        <select v-model="statusFilter" @change="filterBookings" class="search-input">
+            <option value="pending">Pending</option>
+            <option value="rejected">Rejected</option>
+            <option value="accepted">Accepted</option>
+            <option value="done">Done</option>
+        </select>
+    </div>
 
-  <!-- Check if the bookings data is available -->
-  <div v-if="filteredBookings.length > 0">
-    <table class="booking-table">
-      <thead>
-        <tr>
-          <th>Booking ID</th>
-          <th>Status</th>
-          <th>Booking Date</th>
-          <th>Post Name</th>
-          <th>Service</th>
-          <th>Content</th>
-          <th>Price</th>
-          <th>Posted by</th>
-          <th>Action</th> <!-- For the 'Done' button when accepted -->
-        </tr>
-      </thead>
-      <tbody>
-        <tr v-for="booking in filteredBookings" :key="booking.id">
-          <td>{{ booking.id }}</td>
-          <td>{{ booking.status }}</td>
-          <td>{{ formatDate(booking.booking_date) }}</td>
-          <td>{{ booking.post_details.name }}</td>
-          <td>{{ booking.post_details.service }}</td>
-          <td>{{ booking.post_details.content }}</td>
-          <td>{{ booking.post_details.price }}</td>
-          <td>{{ booking.post_details.username }}</td>
-          <td>
-            <div v-if="booking.status === 'accepted' && !booking.reviewSubmitted">
-              <!-- 'Done' button for accepted bookings -->
-              <button v-if="!booking.showReviewBox" @click="showReviewBox(booking.id)">Done</button>
-              <div v-if="booking.showReviewBox">
-                <!-- Text box for review -->
-                <textarea v-model="booking.reviewText" placeholder="Write your review..."></textarea>
-                <br />
-                <!-- Rating input for stars -->
-                <label for="stars">Rating (1-5):</label>
-                <select v-model="booking.rating">
-                  <option v-for="n in 5" :key="n" :value="n">{{ n }}</option>
-                </select>
-                <br />
-                <button @click="submitReview(booking.id)">Submit Review</button>
-              </div>
-            </div>
-            <!-- Cancel button for pending bookings -->
-            <div v-if="booking.status === 'pending'">
-              <button @click="cancelBooking(booking.id)">Cancel</button>
-            </div>
-          </td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
+    <!-- Check if the bookings data is available -->
+    <div class="posts-section" v-if="filteredBookings.length > 0">
+        <table class="posts-table">
+            <thead>
+                <tr>
+                    <th>Booking ID</th>
+                    <th>Status</th>
+                    <th>Booking Date</th>
+                    <th>Post Name</th>
+                    <th>Service</th>
+                    <th>Content</th>
+                    <th>Price</th>
+                    <th>Posted by</th>
+                    <th>Action</th> <!-- For the 'Done' button when accepted -->
+                </tr>
+            </thead>
+            <tbody>
+                <tr v-for="booking in filteredBookings" :key="booking.id">
+                    <td>{{ booking.id }}</td>
+                    <td>{{ booking.status }}</td>
+                    <td>{{ formatDate(booking.booking_date) }}</td>
+                    <td>{{ booking.post_details.name }}</td>
+                    <td>{{ booking.post_details.service }}</td>
+                    <td>{{ booking.post_details.content }}</td>
+                    <td>{{ booking.post_details.price }}</td>
+                    <td>{{ booking.post_details.username }}</td>
+                    <td>
+                        <div v-if="booking.status === 'accepted' && !booking.reviewSubmitted">
+                            <!-- 'Done' button for accepted bookings -->
+                            <button 
+                                v-if="!booking.showReviewBox" 
+                                @click="showReviewBox(booking.id)"
+                                class="action-btn">
+                                Done
+                            </button>
+                            <div v-if="booking.showReviewBox">
+                                <!-- Text box for review -->
+                                <textarea 
+                                    v-model="booking.reviewText" 
+                                    placeholder="Write your review..." 
+                                    class="textarea">
+                                </textarea>
+                                <br />
+                                <!-- Rating input for stars -->
+                                <label for="stars">Rating (1-5):</label>
+                                <select v-model="booking.rating" class="rating-select">
+                                    <option v-for="n in 5" :key="n" :value="n">{{ n }}</option>
+                                </select>
+                                <br />
+                                <button 
+                                    @click="submitReview(booking.id)" 
+                                    class="action-btn">
+                                    Submit Review
+                                </button>
+                            </div>
+                        </div>
+                        <!-- Cancel button for pending bookings -->
+                        <div v-if="booking.status === 'pending'">
+                            <button @click="cancelBooking(booking.id)" class="action-btn">Cancel</button>
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
 
-  <!-- Show a message if no bookings are available -->
-  <div v-else>
-    <p>You have no bookings yet.</p>
-  </div>
+    <!-- Show a message if no bookings are available -->
+    <div v-else>
+        <p class="no-posts-message">You have no bookings yet.</p>
+    </div>
 </div>
+
   `,
   
   data() {

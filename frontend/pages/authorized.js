@@ -1,53 +1,53 @@
 export default {
     template: `
-      <div>
-        <h1>Authorized Posts</h1>
+    <div class="posts-container">
+    <h1 class="section-title">Authorized Posts</h1>
   
-        <!-- Filter Options using select dropdown -->
-        <div>
-          <label for="postFilter">Filter Posts: </label>
-          <select id="postFilter" v-model="filter">
-            <option value="authorized">Show Authorized</option>
-            <option value="unauthorized">Show Unauthorized</option>
-          </select>
-        </div>
+    <!-- Filter Options using select dropdown -->
+    <div class="filter-container">
+      <label for="postFilter" class="filter-label">Filter Posts: </label>
+      <select id="postFilter" v-model="filter" class="filter-select">
+        <option value="authorized">Show Authorized</option>
+        <option value="unauthorized">Show Unauthorized</option>
+      </select>
+    </div>
   
-        <!-- Display posts in a table -->
-        <div v-if="filteredPosts.length === 0">
-          <p>No posts available.</p>
-        </div>
+    <!-- Display posts in a table -->
+    <div v-if="filteredPosts.length === 0" class="no-posts-message">
+      <p>No posts available.</p>
+    </div>
   
-        <div v-else>
-          <table class="posts-table">
-            <thead>
-              <tr>
-                <th>Name</th>
-                <th>Service</th>
-                <th>Content</th>
-                <th>Price</th>
-                <th>Authorized</th>
-                <th>User ID</th> <!-- Added column for User ID -->
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr v-for="post in filteredPosts" :key="post.id" class="post-item">
-                <td>{{ post.name }}</td>
-                <td>{{ post.service }}</td>
-                <td>{{ post.content }}</td>
-                <td>{{ post.price }}</td>
-                <td>{{ post.authorized === 1 ? 'Authorized' : 'Unauthorized' }}</td>
-                <td>{{ post.user_id }}</td> <!-- Display user_id here -->
-                <td>
-                  <!-- Authorization buttons -->
-                  <button v-if="post.authorized === 0" @click="authorizePost(post.id)">Authorize</button>
-                  <button v-if="post.authorized === 1" @click="unauthorizePost(post.id)">Un-Authorize</button>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
+    <div v-else>
+      <table class="posts-table">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Service</th>
+            <th>Content</th>
+            <th>Price</th>
+            <th>Authorized</th>
+            <th>User ID</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="post in filteredPosts" :key="post.id" class="post-item">
+            <td>{{ post.name }}</td>
+            <td>{{ post.service }}</td>
+            <td>{{ post.content }}</td>
+            <td>{{ post.price }}</td>
+            <td>{{ post.authorized === 1 ? 'Authorized' : 'Unauthorized' }}</td>
+            <td>{{ post.user_id }}</td>
+            <td>
+              <!-- Authorization buttons -->
+              <button v-if="post.authorized === 0" @click="authorizePost(post.id)" class="btn-approve">Authorize</button>
+              <button v-if="post.authorized === 1" @click="unauthorizePost(post.id)" class="btn-revoke">Un-Authorize</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
     `,
     data() {
       return {

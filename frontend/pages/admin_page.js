@@ -12,20 +12,44 @@ export default {
 
     methods: {
         async create_csv() {
-            const res = await fetch(location.origin + '/createcsv');
-            const task_id = (await res.json()).task_id;
-            console.log(res.ok);
-            console.log("hahhdahs");
-            
-            const interval = setInterval(async () => {
-                const res = await fetch(location.origin + '/getcsv/' + task_id);
-                if (res.ok){
-                    console.log('csv created');
-                    window.open(`${location.origin}/getcsv/${task_id}`)
-                    clearInterval(interval);
+            try {
+                // Start the process by sending a request to create the CSV
+                const res = await fetch(location.origin + '/createcsv');
+                
+                if (!res.ok) {
+                    throw new Error('Failed to start CSV creation');
                 }
-            },100)
-
+    
+                const data = await res.json();
+                const task_id = data.task_id;
+    
+                console.log('CSV creation started', task_id);
+    
+                // Set up polling to check if the CSV is ready
+                const interval = setInterval(async () => {
+                    try {
+                        const res = await fetch(location.origin + '/getcsv/' + task_id);
+                        
+                        if (res.ok) {
+                            console.log('CSV created');
+                            window.open(`${location.origin}/getcsv/${task_id}`);
+                            clearInterval(interval);
+                        } else {
+                            // Optionally handle non-OK responses
+                            console.error('Error fetching CSV:', res.status, res.statusText);
+                            clearInterval(interval);
+                        }
+                    } catch (error) {
+                        console.error('Error during CSV polling:', error);
+                        clearInterval(interval); // Stop polling on error
+                    }
+                }, 1000); // Poll every second
+    
+            } catch (error) {
+                // Handle errors from the initial fetch or any other issues
+                console.error('Error during CSV creation process:', error);
+                alert('There was an error creating the CSV file. Please try again later.');
+            }
         },
     }
 }

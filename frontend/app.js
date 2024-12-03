@@ -11,10 +11,6 @@ const app = new Vue({
       <Navbar />
     </h1>
 
-    <!-- Conditional rendering for the welcome message -->
-    <h3 v-if="$store.state.loggedin" class="welcome-message">
-      Welcome, {{ $store.state.user_name }}
-    </h3>
 
     <!-- Router View -->
     <router-view></router-view>

@@ -5,66 +5,71 @@ export default {
 
     <!-- Loading state -->
     <div v-if="loading">
-      <p>Loading...</p>
+        <p>Loading...</p>
     </div>
 
     <!-- Error message -->
     <div v-if="error">
-      <p class="error">{{ error }}</p>
+        <p class="error">{{ error }}</p>
     </div>
 
     <!-- Filter options -->
-    <div v-if="!loading && !error">
-      <label for="statusFilter">Filter by status:</label>
-      <select v-model="statusFilter" id="statusFilter">
-        <option value="pending">Pending</option>
-        <option value="accepted">Accepted</option>
-        <option value="rejected">Rejected</option>
-        <option value="done">Done</option>
-      </select>
+    <div v-if="!loading && !error" class="filter-container">
+        <label for="statusFilter">Filter by status:</label>
+        <select v-model="statusFilter" id="statusFilter">
+            <option value="pending">Pending</option>
+            <option value="accepted">Accepted</option>
+            <option value="rejected">Rejected</option>
+            <option value="done">Done</option>
+        </select>
     </div>
 
     <!-- Display bookings in a table if available -->
-    <div v-if="!loading && !error && filteredBookings.length > 0">
-      <h2>Bookings</h2>
-      <table class="bookings-table">
-        <thead>
-          <tr>
-            <th>Booking ID</th>
-            <th>Booking Date</th>
-            <th>Service Name</th>
-            <th>Service Post Name</th>
-            <th>User</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-for="(booking, index) in filteredBookings" :key="booking.booking_id">
-            <td>{{ booking.booking_id }}</td>
-            <td>{{ formatDate(booking.booking_date) }}</td>
-            <td>{{ booking.service }}</td>
-            <td>{{ booking.name }}</td>
-            <td>{{ booking.user_name }}</td>
-            <td>
-              <button 
-                @click="acceptBooking(booking.booking_id)" 
-                class="accept-btn" 
-                :disabled="booking.status !== 'pending'">Accept</button>
-              <button 
-                @click="rejectBooking(booking.booking_id)" 
-                class="reject-btn" 
-                :disabled="booking.status !== 'pending'">Reject</button>
-            </td>
-          </tr>
-        </tbody>
-      </table>
+    <div v-if="!loading && !error && filteredBookings.length > 0" class="bookings-container">
+        <h2>Bookings</h2>
+        <table class="bookings-table">
+            <thead>
+                <tr>
+                    <th>Booking ID</th>
+                    <th>Booking Date</th>
+                    <th>Service Name</th>
+                    <th>Service Post Name</th>
+                    <th>User</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr v-for="(booking, index) in filteredBookings" :key="booking.booking_id">
+                    <td>{{ booking.booking_id }}</td>
+                    <td>{{ formatDate(booking.booking_date) }}</td>
+                    <td>{{ booking.service }}</td>
+                    <td>{{ booking.name }}</td>
+                    <td>{{ booking.user_name }}</td>
+                    <td>
+                        <button 
+                            @click="acceptBooking(booking.booking_id)" 
+                            class="accept-btn" 
+                            :disabled="booking.status !== 'pending'">
+                            Accept
+                        </button>
+                        <button 
+                            @click="rejectBooking(booking.booking_id)" 
+                            class="reject-btn" 
+                            :disabled="booking.status !== 'pending'">
+                            Reject
+                        </button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
     </div>
 
     <!-- If no bookings are found -->
-    <div v-if="!loading && !error && filteredBookings.length === 0">
-      <p>No bookings found for this status.</p>
+    <div v-if="!loading && !error && filteredBookings.length === 0" class="no-bookings-message">
+        <p>No bookings found for this status.</p>
     </div>
-  </div>
+</div>
+
   `,
   data() {
     return {
@@ -167,7 +172,7 @@ export default {
       }
     } catch (error) {
       console.error("Fetch bookings error:", error);
-      this.error = 'An error occurred while fetching bookings.';
+      this.error = 'No bookings found.';
     } finally {
       this.loading = false;
     }

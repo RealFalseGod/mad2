@@ -365,18 +365,22 @@ class bookings(Resource):
         post_count = servicebooking.query.filter_by(
             user_id=user_id, status="pending"
         ).count()
-        print(post_count, 1111)
+        print("hell")
         if post_count >= 5:
             return {"message": "Cant book more than 5 services"}, 500
         existing_booking = (
-            servicebooking.query.filter_by(
-                user_id=user_id, post_id=post_id, booking_date=booking_date, status=""
-            )
-            .filter(servicebooking.status != "rejected")
-            .first()
-        )
+    servicebooking.query.filter(
+        servicebooking.user_id==user_id
+    ).all()
+          
+)       
+        k=[]
+        for i in existing_booking: 
+            if i.post_id==post_id and i.booking_date==booking_date :
+                k.append(i)
+        print(k,existing_booking)
 
-        if existing_booking:
+        if k:
             return {"message": "You have already booked this service on this day"}, 400
         new_booking = servicebooking(
             user_id=user_id,

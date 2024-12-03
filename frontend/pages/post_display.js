@@ -1,34 +1,38 @@
 export default {
     template: `
-    <div class="post-list-container dark-theme">
-        <h1>Your Posts</h1>
+    <div class="user-posts-container">
+    <h1 class="user-posts-title">Your Posts</h1>
 
-        <div v-if="isLoading">
-            <p>Loading...</p>
+    <!-- Loading state -->
+    <div v-if="isLoading" class="user-posts-loading">
+        <p>Loading...</p>
+    </div>
+
+    <!-- No posts available -->
+    <div v-else>
+        <div v-if="posts.length === 0" class="user-posts-empty">
+            <p>No posts available.</p>
         </div>
 
-        <div v-else>
-            <div v-if="posts.length === 0">
-                <p>No posts available.</p>
-            </div>
+        <!-- Posts list -->
+        <div v-else class="user-posts-list">
+            <div v-for="post in posts" :key="post.id" class="user-post-item">
+                <h3 class="user-post-title">{{ post.name }}</h3>
+                <p class="user-post-detail"><strong>Service:</strong> {{ post.service }}</p>
+                <p class="user-post-detail"><strong>Description:</strong> {{ post.content }}</p>
+                <p class="user-post-detail"><strong>Price:</strong> {{ post.price }}</p>
 
-            <div v-else>
-                <div v-for="post in posts" :key="post.id" class="post-item">
-                    <h3>{{ post.name }}</h3>
-                    <p><strong>Service:</strong> {{ post.service }}</p>
-                    <p><strong>Description:</strong> {{ post.content }}</p>
-                    <p><strong>Price:</strong> {{ post.price }}</p>
+                <!-- Authorization status -->
+                <p class="user-post-status"><strong>Status:</strong> {{ post.authorized === 1 ? 'Authorized' : 'Unauthorized' }}</p>
 
-                    <!-- Display authorization status -->
-                    <p><strong>Status:</strong> {{ post.authorized === 1 ? 'Authorized' : 'Unauthorized' }}</p>
-
-                    <!-- Edit and Delete buttons -->
-                    <button @click="editPost(post.id)">Edit</button>
-                    <button @click="deletePost(post.id)">Delete</button>
-                </div>
+                <!-- Edit and Delete buttons -->
+                <button @click="editPost(post.id)" class="btn-edit">Edit</button>
+                <button @click="deletePost(post.id)" class="btn-delete">Delete</button>
             </div>
         </div>
     </div>
+</div>
+
     `,
     data() {
         return {

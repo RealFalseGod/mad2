@@ -1,81 +1,85 @@
 export default {
     template: `
-    <div>
-    <!-- Search Bar with options for pincode, service, or user -->
-    <div>
-      <label for="searchOption">Search by:</label>
-      <select v-model="searchOption" id="searchOption">
-        <option value="pincode">Pincode</option>
-        <option value="service">Service</option>
-        <option value="user">User</option>
-      </select>
+    <div class="post-search-container">
+    <!-- Search Bar -->
+    <div class="search-bar">
+        <label for="searchOption" class="search-label">Search by:</label>
+        <select v-model="searchOption" id="searchOption" class="search-select">
+            <option value="pincode">Pincode</option>
+            <option value="service">Service</option>
+            <option value="user">User</option>
+        </select>
 
-      <!-- Search input based on selected option -->
-      <input 
-        v-if="searchOption === 'pincode'" 
-        v-model="searchQuery" 
-        type="text" 
-        placeholder="Enter Pincode" 
-      />
-      
-      <input 
-        v-if="searchOption === 'service'" 
-        v-model="searchQuery" 
-        type="text" 
-        placeholder="Enter Service" 
-      />
-      
-      <input 
-        v-if="searchOption === 'user'" 
-        v-model="searchQuery" 
-        type="text" 
-        placeholder="Enter User" 
-      />
+        <!-- Conditional Input Fields -->
+        <input 
+            v-if="searchOption === 'pincode'" 
+            v-model="searchQuery" 
+            type="text" 
+            class="search-input"
+            placeholder="Enter Pincode" 
+        />
+        <input 
+            v-if="searchOption === 'service'" 
+            v-model="searchQuery" 
+            type="text" 
+            class="search-input"
+            placeholder="Enter Service" 
+        />
+        <input 
+            v-if="searchOption === 'user'" 
+            v-model="searchQuery" 
+            type="text" 
+            class="search-input"
+            placeholder="Enter User" 
+        />
 
-      <button @click="filterPosts">Search</button>
+        
     </div>
 
-    <!-- Table with Posts -->
-    <div v-if="posts.length === 0">Loading posts...</div>
-    <div v-else>
-    <table border="1" cellpadding="10" cellspacing="0">
-    <thead>
-      <tr>
-        <th>Post Name</th>
-        <th>Service</th>
-        <th>Content</th>
-        <th>Price</th>
-        <th>Created By</th>
-        <th>Total Jobs</th>
-        <th>Average Stars</th>
-        <th>Pincode</th> <!-- Added pincode column -->
-        <th>Address</th> <!-- Added address column -->
-        <th>Booking Date</th>
-        <th>Action</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr v-for="post in filteredPosts" :key="post.id">
-        <td>{{ post.name }}</td>
-        <td>{{ post.service }}</td>
-        <td>{{ post.content }}</td>
-        <td>{{ post.price }}</td>
-        <td>{{ post.username }}</td>
-        <td>{{ post.total_jobs }}</td>
-        <td>{{ post.average_stars }}</td>
-        <td>{{ post.pincode }}</td> <!-- Display the pincode -->
-        <td>{{ post.address }}</td> <!-- Display the address -->
-        <td>
-          <input type="date" v-model="post.bookingDate" :min="minDate" />
-        </td>
-        <td>
-          <button @click="bookService(post)">Book</button>
-        </td>
-      </tr>
-    </tbody>
-  </table>
+    <!-- Table Content -->
+    <div class="posts-section">
+        <div v-if="posts.length === 0" class="loading-message">Loading posts...</div>
+        <div v-else>
+            <table class="posts-table">
+                <thead>
+                    <tr>
+                        <th>Post Name</th>
+                        <th>Service</th>
+                        <th>Content</th>
+                        <th>Price</th>
+                        <th>Created By</th>
+                        <th>Total Jobs</th>
+                        <th>Average Stars</th>
+                        <th>Pincode</th>
+                        <th>Address</th>
+                        <th>Booking Date</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr v-for="post in filteredPosts" :key="post.id">
+                        <td>{{ post.name }}</td>
+                        <td>{{ post.service }}</td>
+                        <td>{{ post.content }}</td>
+                        <td>{{ post.price }}</td>
+                        <td>{{ post.username }}</td>
+                        <td>{{ post.total_jobs }}</td>
+                        <td>{{ post.average_stars }}</td>
+                        <td>{{ post.pincode }}</td>
+                        <td>{{ post.address }}</td>
+                        <td>
+                            <input type="date" v-model="post.bookingDate" :min="minDate" class="date-picker" />
+                        </td>
+                        <td>
+                            <button @click="bookService(post)" class="action-button">Book</button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
     </div>
-  </div>
+</div>
+
     `,
     data() {
       return {

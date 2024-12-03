@@ -4,7 +4,7 @@ from backend.model import db
 from datetime import datetime
 from celery.result import AsyncResult
 from backend.celery.tasks import create_csv
-
+import os
 
 datastore = app.security.datastore
 cache = app.cache
@@ -17,16 +17,34 @@ def home():
 @auth_required("token")
 @app.get('/getcsv/<id>')
 def getCSV(id):
-    result = AsyncResult(id)
-    print(result)
-    print(result.ready())
+    try:
+        # Get the result of the asynchronous task
+        result = AsyncResult(id)
+        print(result)
+        print(result.ready())
 
-    if result.ready():
-        filename = result.result
-        return send_file(f'./backend/celery/userdownload/{filename}') #, as_attachment=True
-    else:
-        return {"status": "Processing"}, 202
+        # Check if the task is complete
+        if result.ready():
+            filename = result.result
+
+            # Ensure the filename is valid
+            if not isinstance(filename, str) or not filename:
+                return {"error": "Invalid filename returned by task."}, 400
+
+            file_path = os.path.join('./backend/celery/userdownload/', filename)
+            
+            # Check if the file exists before attempting to send it
+            if os.path.exists(file_path):
+                return send_file(file_path, as_attachment=True)
+            else:
+                return {"error": "File not found"}, 404
+        else:
+            return {"status": "Processing"}, 202
     
+    except Exception as e:
+        # Catch any exceptions and return an appropriate error message
+        print(f"Error occurred: {e}")
+        return {"error": "An error occurred while fetching the file."}, 500
     
 @auth_required('token') 
 @app.get('/createcsv')

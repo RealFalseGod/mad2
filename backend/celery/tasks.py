@@ -8,25 +8,56 @@ from backend.model import post,servicebooking,db,User,UserRoles
 from backend.celery.mail_service import send_email
 from datetime import datetime, timedelta
 from sqlalchemy import extract
+from io import StringIO
+import os
+import csv
 
 @shared_task(bind = True, ignore_result = False)
 def create_csv(self):
+    booking_count = servicebooking.query.count()
+
+    # Ensure the directory exists
+    download_dir = './backend/celery/userdownload/'
+    if not os.path.exists(download_dir):
+        os.makedirs(download_dir)
+
+    # If no bookings, create an empty CSV with "No data present"
+    if booking_count == 0:
+        task_id = self.request.id or "default_task_id"
+        filename = f'blog_data_{task_id}.csv'
+
+        # Create an in-memory string buffer to write the CSV
+        output = StringIO()
+        writer = csv.writer(output)
+
+        # Write a row with "No data present"
+        writer.writerow(["No data present"])
+
+        # Save the CSV file
+        with open(os.path.join(download_dir, filename), 'w', newline='') as file:
+            file.write(output.getvalue())
+
+        return filename
+
+    # If there are bookings, create a CSV for current month and year with 'done' status
     current_month = datetime.now().month
     current_year = datetime.now().year
     resource = servicebooking.query.filter(
-    extract('month', servicebooking.booking_date) == current_month,
-    extract('year', servicebooking.booking_date) == current_year,
-    servicebooking.status == 'done'  # Assuming 'done' is the status you're looking for
-).all()
-    task_id = self.request.id
+        extract('month', servicebooking.booking_date) == current_month,
+        extract('year', servicebooking.booking_date) == current_year,
+        servicebooking.status == 'done'  # Assuming 'done' is the status you're looking for
+    ).all()
+
+    task_id = self.request.id or "default_task_id"
     filename = f'blog_data_{task_id}.csv'
     column_names = [column.name for column in servicebooking.__table__.columns]
-    # print(column_names)
-    csv_out = flask_excel.make_response_from_query_sets(resource, column_names = column_names, file_type='csv' )
 
-    with open(f'./backend/celery/userdownload/{filename}', 'wb') as file:
+    # Generate the CSV with actual data
+    csv_out = flask_excel.make_response_from_query_sets(resource, column_names=column_names, file_type='csv')
+
+    with open(os.path.join(download_dir, filename), 'wb') as file:
         file.write(csv_out.data)
-    
+
     return filename
 
 @shared_task(ignore_result = False)

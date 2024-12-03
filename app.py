@@ -5,6 +5,8 @@ from backend.model import db, User, Role
 from flask_caching import Cache
 from backend.celery.celery_config import celery_init_app
 import flask_excel as excel
+import os
+
 
 def create_app():
     app = Flask(
