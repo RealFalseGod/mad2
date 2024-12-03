@@ -16,7 +16,7 @@ import csv
 def create_csv(self):
     booking_count = servicebooking.query.count()
 
-    # Ensure the directory exists
+   
     download_dir = './backend/celery/userdownload/'
     if not os.path.exists(download_dir):
         os.makedirs(download_dir)
@@ -45,7 +45,7 @@ def create_csv(self):
     resource = servicebooking.query.filter(
         extract('month', servicebooking.booking_date) == current_month,
         extract('year', servicebooking.booking_date) == current_year,
-        servicebooking.status == 'done'  # Assuming 'done' is the status you're looking for
+        servicebooking.status == 'done'  
     ).all()
 
     task_id = self.request.id or "default_task_id"
@@ -124,8 +124,8 @@ def send_tomorrow_reminders():
 def expire_requests():
     current_datetime = datetime.utcnow()
     requests_to_expire = db.session.query(servicebooking).filter(
-        servicebooking.status.in_(['pending', 'accepted']),  # Ensure the request is either pending or accepted
-        servicebooking.booking_date < current_datetime  # Ensure the request date has passed
+        servicebooking.status.in_(['pending', 'accepted']), 
+        servicebooking.booking_date < current_datetime  
     ).all()
     for request in requests_to_expire:
         request.status = 'expired'

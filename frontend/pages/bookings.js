@@ -32,8 +32,8 @@ export default {
   data() {
     return {
       bookings: [],
-      searchQuery: "",  // To hold the search input value
-      filteredBookings: [],  // To hold filtered bookings
+      searchQuery: "", 
+      filteredBookings: [],  
     }
   },
 
@@ -43,11 +43,11 @@ export default {
       return new Date(dateString).toLocaleDateString(undefined, options);
     },
     searchBookings() {
-      // If search query is empty, show all bookings
+      
       if (this.searchQuery === "") {
         this.filteredBookings = this.bookings;
       } else {
-        // Filter bookings based on the search query (Booking ID)
+       
         this.filteredBookings = this.bookings.filter(booking =>
           booking.id.toString().includes(this.searchQuery)
         );
@@ -64,7 +64,7 @@ export default {
 
     if (res.ok) {
       this.bookings = await res.json();
-      this.filteredBookings = this.bookings;  // Initialize filtered bookings with all bookings
+      this.filteredBookings = this.bookings;  
     } else {
       alert("Failed to fetch bookings");
     }

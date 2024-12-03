@@ -52,16 +52,16 @@ export default {
         }
     },
     async mounted() {
-        // Fetch the post details from the backend and change it
+      
         const res = await fetch(`${location.origin}/api/posts/${this.id}`, {
             headers: {
                 "auth-token": this.$store.state.auth_token,
             },
         });
         if (res.ok) {
-            // Parse the response as JSON
+          
             const post = await res.json();
-            // Assign the post details to the component's data properties
+            
             this.name = post.name;
             this.service = post.service;
             this.content = post.content;
@@ -70,7 +70,7 @@ export default {
     },
     methods: {
         async editpost() {
-            // upload edited data to the backend to edit the post
+           
             const res = await fetch(location.origin + '/api/posts/' + this.id, {
                 headers: {
                     'Content-Type': 'application/json',

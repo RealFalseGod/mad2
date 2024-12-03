@@ -41,7 +41,7 @@ export default {
         };
     },
     mounted() {
-        this.fetchPosts();  // Fetch posts when the component is mounted
+        this.fetchPosts();  
     },
     methods: {
         async fetchPosts() {
@@ -49,12 +49,12 @@ export default {
                 const response = await fetch(`${location.origin}/api/get_postlist`, {
                     headers: {
                         'Content-Type': 'application/json',
-                        'auth-token': this.$store.state.auth_token // Assuming the token is stored in Vuex
+                        'auth-token': this.$store.state.auth_token 
                     }
                 });
 
                 if (response.ok) {
-                    this.posts = await response.json();  // Assign fetched posts to the posts array
+                    this.posts = await response.json();  
                 } else {
                     console.error(`Error fetching posts: ${response.statusText}`);
                 }
@@ -67,7 +67,7 @@ export default {
 
         // Method to handle post editing
         editPost(postId) {
-            // You can implement logic to redirect to the edit page or show a modal with the post's details
+            
             console.log('Navigating to edit post with ID:', postId)
             this.$router.push({ path: `/edit-post/${postId}` });
             console.log(`/edit-post/${postId}` )
@@ -81,12 +81,12 @@ export default {
                         method: 'DELETE',
                         headers: {
                             'Content-Type': 'application/json',
-                            'auth-token': this.$store.state.auth_token // Assuming the token is stored in Vuex
+                            'auth-token': this.$store.state.auth_token 
                         }
                     });
 
                     if (response.ok) {
-                        // Remove the deleted post from the posts array
+                    
                         this.posts = this.posts.filter(post => post.id !== postId);
                     } else {
                         const errorData = await response.json();

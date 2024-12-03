@@ -129,22 +129,22 @@ export default {
   `,
   data() {
     return {
-      userId: null, // Store the user ID from route params
-      userRole: null, // Role of the user (user or staff)
-      bookings: [], // Bookings data
-      reviews: [], // Reviews data
-      posts: [], // Posts data (if staff)
-      jobsDone: 0, // Jobs done by staff
-      stars: 0, // Star rating for the staff
-      isLoading: true, // Loading state for the fetch request
+      userId: null,
+      userRole: null, 
+      bookings: [],
+      reviews: [], 
+      posts: [], 
+      jobsDone: 0, 
+      stars: 0, 
+      isLoading: true, 
     };
   },
   mounted() {
-    // Access the user ID from the route params
+    
     this.userId = this.$route.params.id;
     console.log("User ID received:", this.userId);
 
-    // Fetch data on mount
+    
     this.fetchUserData();
   },
   methods: {
@@ -153,7 +153,7 @@ export default {
         const response = await fetch(`${location.origin}/api/admin_book/${this.userId}`, {
           headers: {
             "Content-Type": "application/json",
-            "auth-token": this.$store.state.auth_token, // Use the token from Vuex store
+            "auth-token": this.$store.state.auth_token,
           },
         });
 
@@ -161,13 +161,13 @@ export default {
           const data = await response.json();
           console.log("API Response:", data);
 
-          // Update the component state
+         
           this.userRole = data.user_role;
           this.bookings = data.bookings;
           this.reviews = data.reviews;
           this.posts = data.posts;
 
-          // If the user is a staff, get the jobs done and stars
+          
           if (this.userRole === "staff") {
             this.jobsDone = data.jobs_done || 0;
             this.stars = data.stars || 0;

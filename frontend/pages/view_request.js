@@ -91,7 +91,7 @@ export default {
     // Method to format booking date
     formatDate(date) {
       const d = new Date(date);
-      return d.toLocaleString(); // Adjust the format as needed
+      return d.toLocaleString(); 
     },
 
     // Method to handle accept action
@@ -145,7 +145,7 @@ export default {
   },
 
   async mounted() {
-    // Ensure the user is authenticated and the necessary details are available
+   
     if (!this.$store.state.user_id || !this.$store.state.auth_token) {
       this.error = 'User is not authenticated';
       this.loading = false;
@@ -153,7 +153,7 @@ export default {
     }
 
     try {
-      // Fetch the service bookings related to the logged-in staff member
+     
       const res = await fetch(`${location.origin}/api/bookings/${this.$store.state.user_id}`, {
         method: 'GET',
         headers: {

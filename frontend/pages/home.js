@@ -161,8 +161,8 @@ export default {
   `,
   data() {
     return {
-      userRole: '', // This will hold the role of the current user (admin, staff, or user)
-      adminStats: null, // Holds the admin statistics
+      userRole: '', 
+      adminStats: null, 
       staffstats: null,
       userstats: null
     }
@@ -183,7 +183,7 @@ export default {
   },
   methods: {
     fetchUserRole() {
-      this.userRole = this.$store.state.role // Example: Using Vuex store to get user role
+      this.userRole = this.$store.state.role 
     },
     formatAverageRating(rating) {
       return parseFloat(rating).toFixed(2);

@@ -35,18 +35,18 @@ export default {
                             window.open(`${location.origin}/getcsv/${task_id}`);
                             clearInterval(interval);
                         } else {
-                            // Optionally handle non-OK responses
+                            
                             console.error('Error fetching CSV:', res.status, res.statusText);
                             clearInterval(interval);
                         }
                     } catch (error) {
                         console.error('Error during CSV polling:', error);
-                        clearInterval(interval); // Stop polling on error
+                        clearInterval(interval); 
                     }
-                }, 1000); // Poll every second
+                }, 1000); 
     
             } catch (error) {
-                // Handle errors from the initial fetch or any other issues
+              
                 console.error('Error during CSV creation process:', error);
                 alert('There was an error creating the CSV file. Please try again later.');
             }

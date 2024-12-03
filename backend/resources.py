@@ -106,7 +106,7 @@ user_booking_fields = {
 review_fields = {
     "id": fields.Integer,
     "user_id": fields.Integer,
-    "p_id": fields.Integer,  # Assuming `p_id` is the post ID or relevant identifier
+    "p_id": fields.Integer, 
     "star": fields.Float,
     "content": fields.String,
 }
@@ -423,7 +423,7 @@ class services_by_staff(Resource):
     @auth_required("token")
     @marshal_with(post_fields)
     def get(self, staff_id):
-        # Ensure only admin or the staff member can access this data
+        
         if not current_user.has_role("admin") and current_user.id != staff_id:
             return {"message": "You are not authorized to view this resource"}, 403
 
@@ -439,7 +439,7 @@ class bookings_by_user(Resource):
     @marshal_with(get_booking_fields)
     def get(self, user_id):
         print(1)
-        # Ensure only admin or the user can access this data
+        
         if current_user.has_role("admin"):
 
             # If the user is admin or accessing their own bookings, get the bookings
@@ -472,7 +472,7 @@ class bookings_by_user(Resource):
                 .first()
             )
             print(post_details.name)
-            # Ensure to handle the case when post_details or user_name is None
+           
             if post_details:
                 service = post_details.service
                 name = post_details.name
@@ -638,7 +638,7 @@ class done_and_review(Resource):
                 new_star = user_review_of_p.star  # Current star rating
                 total_jobs = user_review_of_p.no_of_job
                 # Calculate the new average star rating
-                # Assuming you want to keep a running average
+                
                 updated_avg_star = (new_star + star_rating) / 2
                 user_review_of_p.star = updated_avg_star
             else:
@@ -788,8 +788,8 @@ class get_admin_stats(Resource):
             db.session.query(User)
             .join(UserRoles)
             .filter(
-                User.active == True,  # Ensure the user is active
-                UserRoles.role_id == 3,  # Ensure the user has role_id 2
+                User.active == True,  
+                UserRoles.role_id == 3, 
             )
             .count()
         )
@@ -816,7 +816,7 @@ class get_admin_stats(Resource):
         top_3_staff_by_reviews = (
             db.session.query(
                 User.id,  # User ID
-                User.username,  # Assuming there's a 'username' field
+                User.username,  
                 review_of_p.star,
             )
             .join(
@@ -1002,7 +1002,7 @@ class get_user_stats(Resource):
             review.query.filter_by(user_id=ui)
             .order_by(
                 review.id.desc()
-            )  # Replace 'id' with 'timestamp' if that's the ordering field
+            ) 
             .limit(2)
             .all()
         )

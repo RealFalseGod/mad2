@@ -100,7 +100,7 @@ export default {
           const response = await fetch(`${location.origin}/api/post_list`, {
             headers: {
               "Content-Type": "application/json",
-              "auth-token": this.$store.state.auth_token,  // Assuming you're using token-based authentication
+              "auth-token": this.$store.state.auth_token,  
             },
           });
           if (response.ok) {
@@ -127,7 +127,7 @@ export default {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
-              "auth-token": this.$store.state.auth_token,  // Assuming you're using token-based authentication
+              "auth-token": this.$store.state.auth_token,  
             },
             body: JSON.stringify({
               post_id: post.id,             // Send the post's ID
@@ -137,8 +137,8 @@ export default {
     
           if (response.ok) {
             alert("Booking successful!");
-            post.bookingDate = ''; // Optionally clear the date field after successful booking
-            // Optionally, refresh posts or update the UI here
+            post.bookingDate = ''; 
+          
           } else {
             const errorData = await response.json();
             console.error("Error:", errorData.message);
@@ -183,7 +183,7 @@ export default {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
-              "auth-token": this.$store.state.auth_token, // Assuming you're using token-based authentication
+              "auth-token": this.$store.state.auth_token,
             },
             body: JSON.stringify({
               post_id: post.id,
@@ -208,9 +208,9 @@ export default {
       minDate() {
         const today = new Date();
         const year = today.getFullYear();
-        const month = String(today.getMonth() + 1).padStart(2, '0');  // Ensure two-digit month
-        const day = String(today.getDate()).padStart(2, '0');  // Ensure two-digit day
-        return `${year}-${month}-${day}`;  // Return in the format YYYY-MM-DD
+        const month = String(today.getMonth() + 1).padStart(2, '0');  
+        const day = String(today.getDate()).padStart(2, '0'); 
+        return `${year}-${month}-${day}`; 
       },
       filteredPosts() {
         // Return filtered posts based on the selected search option and query

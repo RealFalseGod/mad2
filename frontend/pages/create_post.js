@@ -60,16 +60,16 @@ export default {
             content: '',
             service: '',
             price: 0,
-            submitted: false, // Track if the form has been submitted
+            submitted: false,
         };
     },
     methods: {
         async createPost() {
-            this.submitted = true; // Mark the form as submitted
+            this.submitted = true; 
 
             // Check if any field is empty
             if (!this.name || !this.service || !this.content || this.price <= 0) {
-                return; // Prevent submission if validation fails
+                return; 
             }
 
             try {
@@ -91,11 +91,11 @@ export default {
                     alert('Post created successfully!');
                     this.$router.push('/');
                 } else {
-                    const errorData = await res.json(); // Parse the error message from the response
-                    alert(errorData.message || 'An unexpected error occurred'); // Show the error message
+                    const errorData = await res.json(); 
+                    alert(errorData.message || 'An unexpected error occurred'); 
                 }
             } catch (error) {
-                // Catch any network or unexpected errors
+              
                 alert('Error: ' + (error.message || 'An unexpected error occurred'));
             }
         }

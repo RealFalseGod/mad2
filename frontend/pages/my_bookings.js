@@ -27,7 +27,7 @@ export default {
                     <th>Content</th>
                     <th>Price</th>
                     <th>Posted by</th>
-                    <th>Action</th> <!-- For the 'Done' button when accepted -->
+                    <th>Action</th> 
                 </tr>
             </thead>
             <tbody>
@@ -42,7 +42,7 @@ export default {
                     <td>{{ booking.post_details.username }}</td>
                     <td>
                         <div v-if="booking.status === 'accepted' && !booking.reviewSubmitted">
-                            <!-- 'Done' button for accepted bookings -->
+                           
                             <button 
                                 v-if="!booking.showReviewBox" 
                                 @click="showReviewBox(booking.id)"
@@ -80,7 +80,7 @@ export default {
         </table>
     </div>
 
-    <!-- Show a message if no bookings are available -->
+   
     <div v-else>
         <p class="no-posts-message">You have no bookings yet.</p>
     </div>
@@ -90,29 +90,29 @@ export default {
   
   data() {
     return {
-      bookings: [], // Array to store the service bookings
-      statusFilter: "pending", // Default status filter
-      filteredBookings: [], // Array to store filtered bookings based on status
-      loading: true, // To track loading state
-      error: null, // To track if there's any error
+      bookings: [],
+      statusFilter: "pending", 
+      filteredBookings: [],
+      loading: true,
+      error: null, 
     };
   },
   
   methods: {
-    // Method to format booking date
+    
     formatDate(date) {
       const d = new Date(date);
-      return d.toLocaleString(); // Adjust the format as needed
+      return d.toLocaleString(); 
     },
   
-    // Method to fetch the bookings from the API
+   
     async fetchBookings() {
       try {
         const res = await fetch(`${location.origin}/api/books`, {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
-            'auth-token': this.$store.state.auth_token, // Ensure to include the token for auth
+            'auth-token': this.$store.state.auth_token, 
           },
         });
   
@@ -196,7 +196,7 @@ export default {
       alert("Review submitted successfully!");
     })
     .catch((error) => {
-      // Handle errors (e.g., network issues, validation errors)
+     
       console.error("Error submitting review:", error);
       alert(`Error submitting review: ${error.message}`);
     });
@@ -236,7 +236,7 @@ export default {
   },
   
   async mounted() {
-    // Ensure the user is authenticated and the necessary details are available
+ 
     if (!this.$store.state.user_id || !this.$store.state.auth_token) {
       this.error = "User is not authenticated";
       this.loading = false;

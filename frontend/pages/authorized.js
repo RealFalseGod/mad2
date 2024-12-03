@@ -51,21 +51,21 @@ export default {
     `,
     data() {
       return {
-        posts: [], // Store posts data
-        filter: 'authorized', // Default filter option is 'authorized'
+        posts: [],
+        filter: 'authorized', 
       };
     },
     mounted() {
-      // Fetch posts when the component is mounted
+      
       this.fetchPosts();
     },
     computed: {
-      // Compute filtered posts based on the selected filter option
+     
       filteredPosts() {
         if (this.filter === 'authorized') {
-          return this.posts.filter(post => post.authorized === 1); // Show only authorized posts
+          return this.posts.filter(post => post.authorized === 1); 
         } else if (this.filter === 'unauthorized') {
-          return this.posts.filter(post => post.authorized === 0); // Show only unauthorized posts
+          return this.posts.filter(post => post.authorized === 0);
         }
       },
     },
@@ -79,11 +79,11 @@ export default {
             },
           });
   
-          // Parse the JSON response
+         
           const data = await res.json();
   
-          // Assign the data to the posts array
-          this.posts = data;  // Assuming the response body is an array of posts
+       
+          this.posts = data;  
         } catch (error) {
           console.error("Error fetching posts:", error);
           alert("Failed to load posts.");
