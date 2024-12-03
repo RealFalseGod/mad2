@@ -1,3 +1,7 @@
+
+sudo apt install python3.12-venv
+python3 -m venv venv
+
 fuser -k 5000/tcp
 celery -A app:celery_app worker -l INFO
 source .venv/bin/activate
